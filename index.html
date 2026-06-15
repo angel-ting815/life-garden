@@ -543,7 +543,31 @@ body::after {
   .panel-backdrop { background:rgba(44,72,45,.08); }
 }
 
-/* ── V11 浮光小紙條 ── */
+
+/* ── V12 主線任務完成 ── */
+.focus-done-card {
+  margin-top:10px;
+  border:1.5px solid #d9e7cf;
+  border-radius:16px;
+  padding:12px 14px;
+  background:#fffefb;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  cursor:pointer;
+  transition:.2s;
+  font-size:14px;
+  font-weight:800;
+  color:#365b3d;
+}
+.focus-done-card.done {
+  background:#83bb67;
+  border-color:#83bb67;
+  color:white;
+}
+.focus-done-card .check-emoji { font-size:18px; }
+
+/* ── V11 今日雲雨光 ── */
 .mood-card { background:linear-gradient(145deg,#fffdf6,#f6fbff); }
 .mood-input-row { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
 .mood-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -583,11 +607,12 @@ body::after {
   opacity:.58; letter-spacing:.02em;
 }
 .mood-word.cloud {
-  color:#2f3238;
-  background:rgba(255,255,255,.64);
-  border:1.5px solid rgba(45,48,54,.15);
-  box-shadow:0 8px 18px rgba(47,50,56,.06);
+  color:#ffffff;
+  background:linear-gradient(145deg, rgba(55,58,64,.95), rgba(30,34,40,.92));
+  border:1.5px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 20px rgba(30,34,40,.18);
 }
+.mood-word.cloud .mood-word-date { color:rgba(255,255,255,.72); opacity:.85; }
 .mood-word.sun {
   color:#8a5e00;
   background:rgba(255,232,128,.72);
@@ -628,7 +653,7 @@ body::after {
   <div class="topbar-title"><span class="title-sprout" aria-hidden="true"></span><span class="title-main">小日子</span><span class="title-sub">生命花園</span></div>
   <div class="topbar-right">
     <div class="streak-chip">🔥 <span id="streakNum">0</span> 天</div>
-    <button class="icon-btn" onclick="openPanel('mood')" title="浮光小紙條">☁️<span>浮光</span></button>
+    <button class="icon-btn" onclick="openPanel('mood')" title="今日雲雨光">☁️<span>雲雨光</span></button>
     <button class="icon-btn" onclick="openPanel('seeds')" title="靈感種子">💡<span>靈感</span></button>
     <button class="icon-btn" onclick="openPanel('body')" title="身體成長">💪<span>身體</span></button>
     <button class="icon-btn" onclick="openPanel('pray')" title="禱告花園">🙏<span>禱告</span></button>
@@ -644,18 +669,6 @@ body::after {
   </div>
 
   <div class="identity" id="identityBox"><div class="identity-icon">🔴</div><div><div class="identity-title">今天是消費者</div><div class="identity-sub">還沒開始澆水，先從一件小事開始。</div></div></div>
-
-  <section class="card mood-card">
-    <div class="section-title">☁️ 心裡小紙條</div>
-    <div class="small">把今天心裡飄過的話放出來，不用整理得很漂亮。</div>
-    <div class="mood-input-row">
-      <input class="input" id="moodInput" maxlength="40" placeholder="例如：我好累 / 我沒遲到 / 好想睡覺">
-      <div class="mood-actions">
-        <button class="btn cloudy" onclick="addMood('cloud')">🖤 放進雲裡</button>
-        <button class="btn sunny" onclick="addMood('sun')">🌟 放進陽光裡</button>
-      </div>
-    </div>
-  </section>
 
   <section class="card soft verse-card-section">
     <div class="section-title">📖 今日靈糧</div>
@@ -682,6 +695,29 @@ body::after {
     <div class="section-title">🎯 今天最重要的一件事</div>
     <div class="small">只能填一件。今天不要開太多支線任務。</div>
     <div class="focus-card"><div>🎯</div><div class="focus-text"><input class="input" id="focusInput" placeholder="例如：去健身房 / 剪完 Apex 精華"></div></div>
+    <div class="focus-done-card" id="focusDoneCard" onclick="toggleFocusDone()"><span class="check-emoji">⬜</span><span>今天最重要的一件事完成了</span></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">💪 身體生命值</div>
+    <div class="stat-mini">
+      <div class="mini-box"><div class="mini-n" id="miniWeight">--</div><div class="mini-l">目前體重 kg</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniMonthDelta">--</div><div class="mini-l">本月變化</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniGymStreak">0</div><div class="mini-l">連續健身</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniGymMonth">0</div><div class="mini-l">本月健身</div></div>
+    </div>
+  </section>
+
+  <section class="card mood-card">
+    <div class="section-title">☁️ 今日雲雨光</div>
+    <div class="small">雲、雨、光都可以先放在這裡，不用整理得很漂亮。</div>
+    <div class="mood-input-row">
+      <input class="input" id="moodInput" maxlength="40" placeholder="例如：我好累 / 我沒遲到 / 好想睡覺">
+      <div class="mood-actions">
+        <button class="btn cloudy" onclick="addMood('cloud')">🖤 放進雲裡</button>
+        <button class="btn sunny" onclick="addMood('sun')">🌟 放進陽光裡</button>
+      </div>
+    </div>
   </section>
 
   <section class="card">
@@ -706,16 +742,6 @@ body::after {
   </section>
 
   <section class="card">
-    <div class="section-title">💪 身體生命值</div>
-    <div class="stat-mini">
-      <div class="mini-box"><div class="mini-n" id="miniWeight">--</div><div class="mini-l">目前體重 kg</div></div>
-      <div class="mini-box"><div class="mini-n" id="miniMonthDelta">--</div><div class="mini-l">本月變化</div></div>
-      <div class="mini-box"><div class="mini-n" id="miniGymStreak">0</div><div class="mini-l">連續健身</div></div>
-      <div class="mini-box"><div class="mini-n" id="miniGymMonth">0</div><div class="mini-l">本月健身</div></div>
-    </div>
-  </section>
-
-  <section class="card">
     <div class="section-title">✅ 保存今天</div>
     <div class="small">早上的經文、讀經、重點，晚上回顧後一起存。按一次就會結算今天 EXP。</div>
     <div class="row" style="margin-top:12px"><button class="btn" style="flex:1" onclick="saveToday()">保存今天的花園 ✓</button></div>
@@ -725,9 +751,9 @@ body::after {
 
 
 <!-- Mood -->
-<div class="panel" id="panel-mood"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">☁️ 浮光小紙條</div></div><div class="panel-body">
-  <div class="card"><div class="section-title">一直飄著的小紙條</div><div class="small">這裡不會每天刷新。深色是雲，暖黃色是陽光；好的壞的都可以暫時放在這裡。</div></div>
-  <div class="mood-meta"><span class="small" id="moodCount">0 張小紙條</span><button class="tiny red" onclick="clearAllMoods()">清空這裡</button></div>
+<div class="panel" id="panel-mood"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">☁️ 今日雲雨光</div></div><div class="panel-body">
+  <div class="card"><div class="section-title">一直飄著的雲雨光</div><div class="small">這裡不會每天刷新。黑色是雲，黃色是光；好的壞的都可以一直留在這裡。</div></div>
+  <div class="mood-meta"><span class="small" id="moodCount">0 則雲雨光</span><button class="tiny red" onclick="clearAllMoods()">清空這裡</button></div>
   <div class="mood-sky" id="moodSky"></div>
   <div class="mood-list" id="moodList"></div>
 </div></div>
@@ -761,7 +787,7 @@ body::after {
 
 <nav class="bottom-nav" aria-label="主要功能">
   <button onclick="scrollToTop()"><b>🌱</b>今日</button>
-  <button onclick="openPanel('mood')"><b>☁️</b>浮光</button>
+  <button onclick="openPanel('mood')"><b>☁️</b>雲雨光</button>
   <button onclick="openPanel('seeds')"><b>💡</b>靈感</button>
   <button onclick="openPanel('body')"><b>💪</b>身體</button>
   <button onclick="openPanel('pray')"><b>🙏</b>禱告</button>
@@ -776,7 +802,7 @@ body::after {
 const VERSES = [
 ['你要專心仰賴耶和華，不可倚靠自己的聰明。','箴言 3:5'],['在你一切所行的事上都要認定他，他必指引你的路。','箴言 3:6'],['我靠著那加給我力量的，凡事都能做。','腓立比書 4:13'],['你們要將一切的憂慮卸給神，因為他顧念你們。','彼得前書 5:7'],['耶和華是我的牧者，我必不致缺乏。','詩篇 23:1'],['我雖然行過死蔭的幽谷，也不怕遭害，因為你與我同在。','詩篇 23:4'],['你當剛強壯膽，不要懼怕，也不要驚惶。','約書亞記 1:9'],['疲乏的，他賜能力；軟弱的，他加力量。','以賽亞書 40:29'],['但那等候耶和華的必重新得力。','以賽亞書 40:31'],['神賜給我們不是膽怯的心，乃是剛強、仁愛、謹守的心。','提摩太後書 1:7'],['你們要先求他的國和他的義，這些東西都要加給你們了。','馬太福音 6:33'],['不要為明天憂慮，因為明天自有明天的憂慮。','馬太福音 6:34'],['你們祈求，就給你們；尋找，就尋見；叩門，就給你們開門。','馬太福音 7:7'],['流淚撒種的，必歡呼收割。','詩篇 126:5'],['你的話是我腳前的燈，是我路上的光。','詩篇 119:105'],['我將你的話藏在心裡，免得我得罪你。','詩篇 119:11'],['耶和華必成全關乎我的事。','詩篇 138:8'],['你要把你的重擔卸給耶和華，他必撫養你。','詩篇 55:22'],['你所做的，要交託耶和華，你所謀的，就必成立。','箴言 16:3'],['人心籌算自己的道路，惟耶和華指引他的腳步。','箴言 16:9'],['殷勤人的手必掌權；懶惰的人必服苦。','箴言 12:24'],['懶惰人羨慕，卻無所得；殷勤人必得豐裕。','箴言 13:4'],['謹守口的，得保生命；大張嘴的，必致敗亡。','箴言 13:3'],['你要保守你心，勝過保守一切，因為一生的果效是由心發出。','箴言 4:23'],['我已指教你走智慧的道，引導你行正直的路。','箴言 4:11'],['你行走，腳步必不致狹窄；你奔跑，也不致跌倒。','箴言 4:12'],['智慧人聽見，增長學問；聰明人得著智謀。','箴言 1:5'],['敬畏耶和華是知識的開端。','箴言 1:7'],['喜樂的心乃是良藥；憂傷的靈使骨枯乾。','箴言 17:22'],['一句話說得合宜，就如金蘋果在銀網子裡。','箴言 25:11'],['凡勞苦擔重擔的人，可以到我這裡來，我就使你們得安息。','馬太福音 11:28'],['我的軛是容易的，我的擔子是輕省的。','馬太福音 11:30'],['在人這是不能的，在神凡事都能。','馬太福音 19:26'],['你們的光也當這樣照在人前。','馬太福音 5:16'],['清心的人有福了，因為他們必得見神。','馬太福音 5:8'],['使人和睦的人有福了，因為他們必稱為神的兒子。','馬太福音 5:9'],['我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。','哥林多後書 12:9'],['若有人在基督裡，他就是新造的人。','哥林多後書 5:17'],['我們行善，不可喪志；若不灰心，到了時候就要收成。','加拉太書 6:9'],['聖靈所結的果子，就是仁愛、喜樂、和平、忍耐。','加拉太書 5:22'],['你們要靠主常常喜樂。','腓立比書 4:4'],['應當一無掛慮，只要凡事藉著禱告、祈求和感謝。','腓立比書 4:6'],['神所賜出人意外的平安，必在基督耶穌裡保守你們的心懷意念。','腓立比書 4:7'],['忘記背後，努力面前的，向著標竿直跑。','腓立比書 3:13-14'],['你們要思念上面的事，不要思念地上的事。','歌羅西書 3:2'],['無論做什麼，都要從心裡做，像是給主做的。','歌羅西書 3:23'],['常常喜樂，不住地禱告，凡事謝恩。','帖撒羅尼迦前書 5:16-18'],['信就是所望之事的實底，是未見之事的確據。','希伯來書 11:1'],['仰望為我們信心創始成終的耶穌。','希伯來書 12:2'],['忍受試探的人是有福的。','雅各書 1:12'],['你們中間若有缺少智慧的，應當求那厚賜與眾人也不斥責人的神。','雅各書 1:5'],['各人要快快地聽，慢慢地說，慢慢地動怒。','雅各書 1:19'],['只是你們要行道，不要單單聽道。','雅各書 1:22'],['務要謙卑在神大能的手下，到了時候，他必叫你們升高。','彼得前書 5:6'],['你們要謹慎自守，警醒禱告。','彼得前書 4:7'],['愛裡沒有懼怕；愛既完全，就把懼怕除去。','約翰一書 4:18'],['我們愛，因為神先愛我們。','約翰一書 4:19'],['在世上你們有苦難；但你們可以放心，我已經勝了世界。','約翰福音 16:33'],['我留下平安給你們；我將我的平安賜給你們。','約翰福音 14:27'],['我是葡萄樹，你們是枝子。','約翰福音 15:5'],['叫人活著的乃是靈，肉體是無益的。','約翰福音 6:63'],['神愛世人，甚至將他的獨生子賜給他們。','約翰福音 3:16'],['你不要害怕，因為我與你同在。','以賽亞書 41:10'],['我必堅固你，我必幫助你。','以賽亞書 41:10'],['我必用我公義的右手扶持你。','以賽亞書 41:10'],['我耶和華你的神必攙扶你的右手。','以賽亞書 41:13'],['我行事誰能阻止呢？','以賽亞書 43:13'],['你從水中經過，我必與你同在。','以賽亞書 43:2'],['看哪，我要做一件新事。','以賽亞書 43:19'],['堅心倚賴你的，你必保守他十分平安。','以賽亞書 26:3'],['他必像一棵樹栽在溪水旁，按時候結果子。','詩篇 1:3'],['耶和華是我的亮光，是我的拯救，我還怕誰呢？','詩篇 27:1'],['你當等候耶和華；當壯膽，堅固你的心。','詩篇 27:14'],['神啊，求你為我造清潔的心。','詩篇 51:10'],['我的心哪，你為何憂悶？應當仰望神。','詩篇 42:11'],['我的幫助從造天地的耶和華而來。','詩篇 121:2'],['耶和華要保護你，免受一切的災害。','詩篇 121:7'],['凡敬畏耶和華、遵行他道的人便為有福。','詩篇 128:1'],['耶和華本為善，他的慈愛存到永遠。','詩篇 100:5'],['你們要休息，要知道我是神。','詩篇 46:10'],['耶和華靠近傷心的人。','詩篇 34:18'],['你們要嘗嘗主恩的滋味，便知道他是美善。','詩篇 34:8'],['少年獅子還缺食忍餓，但尋求耶和華的什麼好處都不缺。','詩篇 34:10'],['當將你的事交託耶和華，並倚靠他，他就必成全。','詩篇 37:5'],['你要以耶和華為樂，他就將你心裡所求的賜給你。','詩篇 37:4'],['你當默然倚靠耶和華，耐性等候他。','詩篇 37:7'],['耶和華的慈愛歸於敬畏他的人，從亙古到永遠。','詩篇 103:17'],['我的心哪，你要稱頌耶和華，不可忘記他的一切恩惠。','詩篇 103:2'],['他赦免你的一切罪孽，醫治你的一切疾病。','詩篇 103:3'],['你們要將心意改換一新而變化。','羅馬書 12:2'],['不要效法這個世界，只要心意更新而變化。','羅馬書 12:2'],['萬事都互相效力，叫愛神的人得益處。','羅馬書 8:28'],['靠著愛我們的主，在這一切的事上已經得勝有餘了。','羅馬書 8:37'],['若神幫助我們，誰能敵擋我們呢？','羅馬書 8:31'],['我們既因信稱義，就藉著我們的主耶穌基督得與神相和。','羅馬書 5:1'],['患難生忍耐，忍耐生老練，老練生盼望。','羅馬書 5:3-4'],['神的愛已經藉著所賜給我們的聖靈澆灌在我們心裡。','羅馬書 5:5'],['你們或吃或喝，無論做什麼，都要為榮耀神而行。','哥林多前書 10:31'],['凡事都可行，但不都有益處。','哥林多前書 10:23'],['愛是恆久忍耐，又有恩慈。','哥林多前書 13:4'],['如今常存的有信，有望，有愛；其中最大的是愛。','哥林多前書 13:13'],['主耶和華是我的力量。','哈巴谷書 3:19']
 ];
-const CHECKS=[['create','🎨','創作',10],['action','🚀','行動',10],['gym','💪','健身',10],['bible','📖','讀經',5]];
+const CHECKS=[['create','🎨','創作',10],['gym','💪','健身',10],['bible','📖','讀經',5],['eat','🥗','好好吃',5]];
 const STAGES=[ [1,'種子','🌱'],[3,'幼苗','🌿'],[5,'嫩芽','🌱'],[10,'小樹','🌳'],[20,'茂盛樹','🌳'],[30,'開花樹','🌸'],[50,'結果樹','🍎'],[100,'森林守護者','🌲'] ];
 const DEFAULT_REWARDS=[
  {name:'雞排',amount:80,level:3,claimed:false},{name:'豆花',amount:60,level:4,claimed:false},{name:'TEATOP 有料飲料',amount:70,level:5,claimed:false},{name:'珍奶',amount:65,level:7,claimed:false},{name:'鹽酥雞一次',amount:150,level:10,claimed:false},{name:'想吃很久的午餐',amount:200,level:12,claimed:false},{name:'遊戲造型小額基金',amount:300,level:15,claimed:false},{name:'一件衣服基金',amount:500,level:20,claimed:false},{name:'鍵盤基金 +500',amount:500,level:25,claimed:false},{name:'耳機基金 +500',amount:500,level:30,claimed:false}
@@ -787,15 +813,15 @@ function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}ca
 function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 let data=gs('lifeGardenData',{days:{},seeds:[],weights:[],prayers:[],rewards:DEFAULT_REWARDS,totalExp:0,lastLevel:1,verseOverride:null,transfers:0,moods:[]});
-let today=data.days[keyToday()]||{checks:{},verseOpened:false,devotion:'',focus:'',thought:'',harvest:'',gratitudes:[],saved:false};
+let today=data.days[keyToday()]||{checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
 let activePanel=null, prayerTab='active';
 function dayHash(){return parseInt(keyToday().replace(/-/g,''))}
 function getLevelInfo(exp=data.totalExp){ let level=Math.floor(exp/50)+1; let into=exp%50; let stage=STAGES[0]; STAGES.forEach(s=>{if(level>=s[0]) stage=s}); return {level,into,next:50,stageName:stage[1],emoji:stage[2]}; }
-function calcTodayExp(d=today){let exp=0; CHECKS.forEach(c=>{if(d.checks&&d.checks[c[0]]) exp+=c[3]}); if(d.verseOpened) exp+=5; if(d.thought) exp+=5; if(d.harvest) exp+=5; if(d.gratitudes) exp+=Math.min(3,d.gratitudes.length)*3; if(d.devotion) exp+=5; return exp;}
+function calcTodayExp(d=today){let exp=0; CHECKS.forEach(c=>{if(d.checks&&d.checks[c[0]]) exp+=c[3]}); if(d.verseOpened) exp+=5; if(d.focusDone) exp+=10; if(d.thought) exp+=5; if(d.harvest) exp+=5; if(d.gratitudes) exp+=Math.min(3,d.gratitudes.length)*3; if(d.devotion) exp+=5; return exp;}
 function saveData(){data.days[keyToday()]=today; ss('lifeGardenData',data)}
 function init(){if(!data.moods)data.moods=[];renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();}
-function renderAll(){renderLevel();renderIdentity();renderGratitudes();renderBodyMini();renderStreak();}
-function renderVerse(){let idx=dayHash()%VERSES.length; let v=VERSES[idx]; document.getElementById('verseText').textContent='「'+v[0]+'」'; document.getElementById('verseRef').textContent=v[1]; document.getElementById('devotionNote').value=today.devotion||''; document.getElementById('focusInput').value=today.focus||''; document.getElementById('thoughtInput').value=today.thought||''; document.getElementById('harvestInput').value=today.harvest||''; document.getElementById('verseFlip').classList.toggle('flipped',!!today.verseOpened);}
+function renderAll(){renderLevel();renderIdentity();renderFocusDone();renderGratitudes();renderBodyMini();renderStreak();}
+function renderVerse(){let idx=dayHash()%VERSES.length; let v=VERSES[idx]; document.getElementById('verseText').textContent='「'+v[0]+'」'; document.getElementById('verseRef').textContent=v[1]; document.getElementById('devotionNote').value=today.devotion||''; document.getElementById('focusInput').value=today.focus||''; document.getElementById('thoughtInput').value=today.thought||''; document.getElementById('harvestInput').value=today.harvest||''; document.getElementById('verseFlip').classList.toggle('flipped',!!today.verseOpened); renderFocusDone();}
 function openVerseCard(){
   if(today.verseOpened) return;
 
@@ -821,6 +847,20 @@ function openVerseCard(){
   if(after > before) showLevelModal(after, before);
 }
 function bindAutoSave(){['devotionNote','focusInput','thoughtInput','harvestInput'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{today.devotion=document.getElementById('devotionNote').value.trim();today.focus=document.getElementById('focusInput').value.trim();today.thought=document.getElementById('thoughtInput').value.trim();today.harvest=document.getElementById('harvestInput').value.trim();saveData();renderIdentity();});});}
+
+function renderFocusDone(){
+  let el=document.getElementById('focusDoneCard');
+  if(!el) return;
+  el.classList.toggle('done', !!today.focusDone);
+  el.innerHTML=`<span class="check-emoji">${today.focusDone?'✅':'⬜'}</span><span>今天最重要的一件事完成了</span>`;
+}
+function toggleFocusDone(){
+  today.focusDone=!today.focusDone;
+  saveData();
+  renderFocusDone();
+  renderIdentity();
+  if(today.focusDone) sparkle();
+}
 function renderChecks(){let grid=document.getElementById('checkGrid');grid.innerHTML=CHECKS.map(c=>`<div class="check-card ${today.checks[c[0]]?'done':''}" onclick="toggleCheck('${c[0]}')"><span class="check-emoji">${c[1]}</span><span class="check-label">今天有${c[2]}</span></div>`).join('')}
 function toggleCheck(k){today.checks[k]=!today.checks[k];saveData();renderChecks();renderIdentity();renderBodyMini(); if(today.checks[k]) sparkle();}
 function addGratitude(){let inp=document.getElementById('gratInput');let v=inp.value.trim(); if(!v)return; if(today.gratitudes.length>=3){toast('最多三件就好，夠了 🙏');return} today.gratitudes.push(v); inp.value=''; saveData(); renderGratitudes();}
@@ -828,7 +868,7 @@ function delGratitude(i){today.gratitudes.splice(i,1);saveData();renderGratitude
 function renderGratitudes(){let el=document.getElementById('gratList'); el.innerHTML=(today.gratitudes||[]).map((g,i)=>`<div class="grat-item"><span>🙏 ${esc(g)}</span><button class="tiny red" onclick="delGratitude(${i})">×</button></div>`).join('')}
 function saveToday(){today.devotion=document.getElementById('devotionNote').value.trim(); today.focus=document.getElementById('focusInput').value.trim(); today.thought=document.getElementById('thoughtInput').value.trim(); today.harvest=document.getElementById('harvestInput').value.trim(); let before=getLevelInfo().level; let oldExp=today.saved? today.savedExp||0 : 0; let newExp=calcTodayExp(today); data.totalExp += (newExp-oldExp); today.saved=true; today.savedExp=newExp; saveData(); let after=getLevelInfo().level; renderAll(); sparkle(); toast('今天的花園保存了 🌱'); if(after>before) showLevelModal(after,before);}
 function renderLevel(){let info=getLevelInfo();document.getElementById('levelPill').textContent=`Lv.${info.level} ${info.stageName}`;document.getElementById('plantEmoji').textContent=info.emoji;document.getElementById('expFill').style.width=(info.into/info.next*100)+'%';document.getElementById('expText').textContent=`${info.into}/${info.next}`;document.getElementById('heroLabel').textContent=`總 EXP ${data.totalExp} · ${info.stageName}`;}
-function renderIdentity(){let c=today.checks||{};let hasThought=!!(today.thought||today.harvest);let icon='🔴',title='今天是消費者',sub='還沒開始澆水，先從一件小事開始。'; if(hasThought&&c.action&&c.create){icon='✨';title='今天是創造者';sub='有思考、有行動、有創作，今天很完整。'} else if(hasThought&&c.action){icon='🟢';title='今天是成長者';sub='有思考也有往前走，這很重要。'} else if(hasThought){icon='🟡';title='今天是觀察者';sub='有停下來想，已經不是無腦消費。'} document.getElementById('identityBox').innerHTML=`<div class="identity-icon">${icon}</div><div><div class="identity-title">${title}</div><div class="identity-sub">${sub}</div></div>`;}
+function renderIdentity(){let c=today.checks||{};let hasThought=!!(today.thought||today.harvest);let hasMain=!!today.focusDone;let icon='🔴',title='今天是消費者',sub='還沒開始澆水，先從一件小事開始。'; if(hasThought&&hasMain&&c.create){icon='✨';title='今天是創造者';sub='有思考、有主線完成、有創作，今天很完整。'} else if(hasThought&&hasMain){icon='🟢';title='今天是成長者';sub='有思考，也有把今天最重要的一件事往前推。'} else if(hasThought){icon='🟡';title='今天是觀察者';sub='有停下來想，已經不是無腦消費。'} document.getElementById('identityBox').innerHTML=`<div class="identity-icon">${icon}</div><div><div class="identity-title">${title}</div><div class="identity-sub">${sub}</div></div>`;}
 function calcStreak(){let s=0,d=new Date();while(true){let dk=d.toISOString().slice(0,10), day=data.days[dk]; let ok=day&&(day.saved||Object.values(day.checks||{}).some(Boolean)); if(!ok){if(dk===keyToday()){d.setDate(d.getDate()-1);continue} break} s++; d.setDate(d.getDate()-1);}return s}
 function renderStreak(){document.getElementById('streakNum').textContent=calcStreak()}
 function getWeightStats(){let weights=data.weights||[];let latest=weights[0]?.weight||null;let thisMonth=weights.filter(w=>w.date.slice(0,7)===monthKey()).slice().reverse();let delta=null;if(thisMonth.length>=2)delta=(thisMonth[thisMonth.length-1].weight-thisMonth[0].weight).toFixed(1);let gymMonth=Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks.gym).length;let gymStreak=0,d=new Date();while(true){let dk=d.toISOString().slice(0,10), day=data.days[dk];if(day&&day.checks&&day.checks.gym){gymStreak++;d.setDate(d.getDate()-1)}else{if(dk===keyToday()&&!today.checks.gym){break}else break}}return{latest,delta,gymMonth,gymStreak}}
@@ -850,7 +890,7 @@ function scrollToTop(){ closePanel(); document.getElementById('mainArea').scroll
 function addMood(type){
   let inp=document.getElementById('moodInput');
   let v=inp.value.trim();
-  if(!v){toast('先寫一句心裡小紙條 ☁️');return}
+  if(!v){toast('先寫一句今日雲雨光 ☁️');return}
   if(!data.moods)data.moods=[];
   data.moods.unshift({text:v,type:type,date:keyToday(),time:new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})});
   inp.value='';
@@ -868,10 +908,10 @@ function moodDateLabel(m){
 function renderMoodSky(){
   let sky=document.getElementById('moodSky'), list=document.getElementById('moodList'), count=document.getElementById('moodCount');
   let arr=allMoods();
-  if(count)count.textContent=arr.length+' 張小紙條';
+  if(count)count.textContent=arr.length+' 則雲雨光';
   if(!sky||!list)return;
   if(!arr.length){
-    sky.innerHTML='<div class="empty" style="position:relative;z-index:2;padding-top:145px">☁️<br><br>這裡還很空<br>可以先放一張小紙條上來</div>';
+    sky.innerHTML='<div class="empty" style="position:relative;z-index:2;padding-top:145px">☁️<br><br>這裡還很空<br>可以先放一則雲雨光上來</div>';
     list.innerHTML='';
     return;
   }
@@ -887,11 +927,13 @@ function delMood(todayIndex){
   if(real>-1)data.moods.splice(real,1);
   saveData(); renderMoodSky();
 }
-function clearTodayMoods(){
-  if(!confirm('要清空這些小紙條嗎？'))return;
-  data.moods=(data.moods||[]).filter(m=>m.date!==keyToday());
-  saveData(); renderMoodSky(); toast('小紙條清空了 ☁️');
+function clearAllMoods(){
+  if(!confirm('要清空所有雲雨光嗎？'))return;
+  data.moods=[];
+  saveData(); renderMoodSky(); toast('雲雨光清空了 ☁️');
 }
+function clearTodayMoods(){ clearAllMoods(); }
+
 
 function addSeed(){let inp=document.getElementById('seedInput');let v=inp.value.trim();if(!v)return;data.seeds.unshift({text:v,date:keyToday(),done:false});inp.value='';saveData();renderSeeds();toast('靈感種下了 💡')}
 function executeSeed(i){let s=data.seeds[i];today.focus='製作／執行：'+s.text;s.done=true;data.transfers=(data.transfers||0)+1;document.getElementById('focusInput').value=today.focus;saveData();renderSeeds();toast('已放進今天最重要的一件事 🎯')}
@@ -948,11 +990,30 @@ function importBackup(){
     const obj = JSON.parse(raw);
     if(!obj || typeof obj !== 'object' || !obj.days){ throw new Error('bad'); }
     data = obj;
-    today = data.days[keyToday()] || {checks:{},verseOpened:false,devotion:'',focus:'',thought:'',harvest:'',gratitudes:[],saved:false};
+    today = data.days[keyToday()] || {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
     saveData();
     renderVerse(); renderChecks(); renderAll(); renderSettings();
     toast('備份已還原 🌱');
   }catch(e){ toast('備份格式不對 QQ'); }
+}
+
+function importBackupFile(input){
+  const file = input.files && input.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const obj = JSON.parse(reader.result);
+      if(!obj || typeof obj !== 'object' || !obj.days){ throw new Error('bad'); }
+      data = obj;
+      today = data.days[keyToday()] || {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
+      saveData();
+      renderVerse(); renderChecks(); renderAll(); renderSettings();
+      toast('備份檔已還原到這台裝置 🌱');
+    }catch(e){ toast('備份檔格式不對 QQ'); }
+    input.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
 }
 function copyBackupText(){
   const el = document.getElementById('backupText');
@@ -966,7 +1027,7 @@ function resetTodayOnly(){
   if(!confirm('確定只重置今天的紀錄嗎？總 EXP 會扣掉今天已保存的 EXP。')) return;
   data.totalExp = Math.max(0, data.totalExp - (today.savedExp || 0));
   delete data.days[keyToday()];
-  today = {checks:{},verseOpened:false,devotion:'',focus:'',thought:'',harvest:'',gratitudes:[],saved:false};
+  today = {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
   saveData();
   renderVerse(); renderChecks(); renderAll(); renderSettings();
   toast('今天已重置，可以重新翻經文 🌱');
@@ -974,18 +1035,19 @@ function resetTodayOnly(){
 function renderSettings(){
   const el = document.getElementById('moreSettings');
   const todayExp = today.savedExp || 0;
-  el.innerHTML = `<div class="card"><div class="section-title">⚙️ 設定與備份</div><div class="small">如果瀏覽器快取讓今天經文已翻開但沒有加 EXP，可以在這裡補領或重置今天。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="repairTodayVerseExp()">補領今日靈糧 +5 EXP</button><button class="btn secondary" onclick="resetTodayOnly()">只重置今天紀錄</button></div></div><div class="card"><div class="section-title">💾 備份資料</div><div class="small">資料存在這台瀏覽器的 localStorage。換裝置或清快取前，建議先下載備份。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="exportBackup()">下載備份 JSON</button><button class="btn secondary" onclick="copyBackupText()">產生/複製備份文字</button><textarea class="textarea" id="backupText" placeholder="可貼上備份 JSON 後按還原" style="min-height:130px"></textarea><button class="btn gold" onclick="importBackup()">還原備份</button></div></div><div class="card"><div class="section-title">🌱 今日狀態</div><div class="small">今日已保存 EXP：${todayExp}｜經文：${today.verseOpened?'已翻開':'未翻開'}｜靈糧 EXP：${today.verseExpAwarded?'已領取':'未領取'}</div></div>`;
+  el.innerHTML = `<div class="card"><div class="section-title">⚙️ 設定與備份</div><div class="small">如果瀏覽器快取讓今天經文已翻開但沒有加 EXP，可以在這裡補領或重置今天。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="repairTodayVerseExp()">補領今日靈糧 +5 EXP</button><button class="btn secondary" onclick="resetTodayOnly()">只重置今天紀錄</button></div></div><div class="card"><div class="section-title">🔄 手機 / 電腦同步助手</div><div class="small">目前是純前端網站，資料會存在各裝置自己的瀏覽器 localStorage，所以手機和電腦不會自動同步。要同步時：先在有資料的裝置下載備份 JSON，再到另一台裝置匯入備份檔。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="exportBackup()">下載備份 JSON</button><label class="btn secondary" style="text-align:center;cursor:pointer">匯入備份檔<input type="file" accept="application/json,.json" onchange="importBackupFile(this)" style="display:none"></label><button class="btn secondary" onclick="copyBackupText()">產生/複製備份文字</button><textarea class="textarea" id="backupText" placeholder="也可以貼上備份 JSON 後按還原" style="min-height:130px"></textarea><button class="btn gold" onclick="importBackup()">用文字還原備份</button></div></div><div class="card"><div class="section-title">🌱 今日狀態</div><div class="small">今日已保存 EXP：${todayExp}｜經文：${today.verseOpened?'已翻開':'未翻開'}｜靈糧 EXP：${today.verseExpAwarded?'已領取':'未領取'}</div></div>`;
 }
 
 function showMoreTab(tab,btn){['Stats','Rewards','History','Settings'].forEach(n=>document.getElementById('more'+n).style.display='none');document.getElementById('more'+tab[0].toUpperCase()+tab.slice(1)).style.display='block';btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');if(tab==='stats')renderStatsMore();if(tab==='rewards')renderRewards();if(tab==='history')renderHistory();if(tab==='settings')renderSettings()}
 function countMonth(k){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks[k]).length}
+function countMonthFocusDone(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.focusDone).length}
 function countMonthThought(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&(day.thought||day.harvest)).length}
-function renderStatsMore(){let info=getLevelInfo(),answered=data.prayers.filter(p=>p.answered).length;document.getElementById('moreStats').innerHTML=`<div class="stats-nums"><div class="stat-box"><div class="stat-n">${calcStreak()}</div><div class="stat-l">連續成長天數</div></div><div class="stat-box"><div class="stat-n">${data.totalExp}</div><div class="stat-l">總 EXP</div></div><div class="stat-box"><div class="stat-n">${info.level}</div><div class="stat-l">目前等級</div></div><div class="stat-box"><div class="stat-n">${data.transfers||0}</div><div class="stat-l">靈感轉行動</div></div><div class="stat-box"><div class="stat-n">${countMonthThought()}</div><div class="stat-l">本月思考</div></div><div class="stat-box"><div class="stat-n">${countMonth('action')}</div><div class="stat-l">本月行動</div></div><div class="stat-box"><div class="stat-n">${countMonth('create')}</div><div class="stat-l">本月創作</div></div><div class="stat-box"><div class="stat-n">${countMonth('bible')}</div><div class="stat-l">本月讀經</div></div><div class="stat-box"><div class="stat-n">${countMonth('gym')}</div><div class="stat-l">本月健身</div></div><div class="stat-box"><div class="stat-n">${answered}</div><div class="stat-l">已蒙應允禱告</div></div></div>`}
+function renderStatsMore(){let info=getLevelInfo(),answered=data.prayers.filter(p=>p.answered).length;document.getElementById('moreStats').innerHTML=`<div class="stats-nums"><div class="stat-box"><div class="stat-n">${calcStreak()}</div><div class="stat-l">連續成長天數</div></div><div class="stat-box"><div class="stat-n">${data.totalExp}</div><div class="stat-l">總 EXP</div></div><div class="stat-box"><div class="stat-n">${info.level}</div><div class="stat-l">目前等級</div></div><div class="stat-box"><div class="stat-n">${data.transfers||0}</div><div class="stat-l">靈感轉行動</div></div><div class="stat-box"><div class="stat-n">${countMonthThought()}</div><div class="stat-l">本月思考</div></div><div class="stat-box"><div class="stat-n">${countMonthFocusDone()}</div><div class="stat-l">本月主線完成</div></div><div class="stat-box"><div class="stat-n">${countMonth('create')}</div><div class="stat-l">本月創作</div></div><div class="stat-box"><div class="stat-n">${countMonth('bible')}</div><div class="stat-l">本月讀經</div></div><div class="stat-box"><div class="stat-n">${countMonth('gym')}</div><div class="stat-l">本月健身</div></div><div class="stat-box"><div class="stat-n">${countMonth('eat')}</div><div class="stat-l">本月好好吃</div></div><div class="stat-box"><div class="stat-n">${answered}</div><div class="stat-l">已蒙應允禱告</div></div></div>`}
 function addReward(){let n=document.getElementById('rewardName').value.trim(),a=parseInt(document.getElementById('rewardAmount').value||0),l=parseInt(document.getElementById('rewardLevel').value||1);if(!n)return;data.rewards.unshift({name:n,amount:a,level:l,claimed:false});saveData();renderRewards();toast('願望種下了 🎁')}
 function claimReward(i){data.rewards[i].claimed=true;saveData();renderRewards();toast('已領取，記得不要超支 😆')}
 function delReward(i){data.rewards.splice(i,1);saveData();renderRewards()}
 function renderRewards(){let lv=getLevelInfo().level;document.getElementById('moreRewards').innerHTML=`<div class="card"><div class="section-title">🎁 新增獎勵</div><div class="stack"><input class="input" id="rewardName" placeholder="例如：雞排 / 新衣服基金"><div class="row"><input class="input" id="rewardAmount" type="number" placeholder="金額"><input class="input" id="rewardLevel" type="number" placeholder="所需Lv"></div><button class="btn" onclick="addReward()">加入願望樹</button></div></div><div class="stack">${data.rewards.map((r,i)=>`<div class="reward-item ${lv<r.level?'reward-locked':''}"><span>${r.claimed?'✅':(lv>=r.level?'🎁':'🔒')}</span><span class="reward-text"><b>${esc(r.name)}</b> <span class="badge">Lv.${r.level}</span><br><small style="color:var(--ink-mute)">${r.amount?('$'+r.amount):'未設定金額'} ${r.claimed?'｜已領取':''}</small></span><div class="reward-actions">${lv>=r.level&&!r.claimed?`<button class="tiny gold" onclick="claimReward(${i})">領取</button>`:''}<button class="tiny red" onclick="delReward(${i})">×</button></div></div>`).join('')}</div>`}
-function renderHistory(){let days=Object.entries(data.days).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,60);document.getElementById('moreHistory').innerHTML=days.length?`<div class="stack">${days.map(([d,day])=>{let done=CHECKS.filter(c=>day.checks&&day.checks[c[0]]).map(c=>c[1]+c[2]).join('、')||'未打勾';return `<div class="history-item"><span>📅</span><span class="prayer-text"><b>${d}</b><br>${done}<br><small style="color:var(--ink-mute)">${esc(day.thought||day.harvest||day.focus||'')}</small></span></div>`}).join('')}</div>`:'<div class="empty">🌱<br><br>還沒有記錄</div>'}
+function renderHistory(){let days=Object.entries(data.days).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,60);document.getElementById('moreHistory').innerHTML=days.length?`<div class="stack">${days.map(([d,day])=>{let done=CHECKS.filter(c=>day.checks&&day.checks[c[0]]).map(c=>c[1]+c[2]).concat(day.focusDone?['🎯主線完成']:[]).join('、')||'未打勾';return `<div class="history-item"><span>📅</span><span class="prayer-text"><b>${d}</b><br>${done}<br><small style="color:var(--ink-mute)">${esc(day.thought||day.harvest||day.focus||'')}</small></span></div>`}).join('')}</div>`:'<div class="empty">🌱<br><br>還沒有記錄</div>'}
 function showLevelModal(after,before){let available=data.rewards.filter(r=>!r.claimed&&r.level<=after&&r.level>before);document.getElementById('modalTitle').textContent=`升級到 Lv.${after}！`;document.getElementById('modalText').innerHTML=available.length?`可以領取獎勵：<br><b>${available.map(r=>esc(r.name)).join('、')}</b>`:'花園長大了，繼續累積你的願望樹 🎁';document.getElementById('levelModal').classList.add('show')}
 function closeLevelModal(){document.getElementById('levelModal').classList.remove('show')}
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2000)}
