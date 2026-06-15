@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>小日子 · 生命花園</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;800&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:#1e2d1e; --ink-mid:#4a614a; --ink-soft:#7a967a; --ink-mute:#b0c4b0;
+  --leaf:#3d7a3d; --leaf-lt:#5fa05f; --moss:#ddeedd; --mist:#f2f8f2; --snow:#fafcfa;
+  --gold:#c8873a; --gold-lt:#f5e8d5; --rose:#d27b7b; --rose-lt:#f7e3e3; --sky:#6f9fb8; --sky-lt:#e5f0f7;
+  --r:20px; --shadow:0 2px 16px rgba(30,60,30,.07);
+}
+html, body { height:100%; font-family:'Noto Sans TC',sans-serif; background:var(--mist); color:var(--ink); -webkit-font-smoothing:antialiased; }
+body {
+  background:
+    radial-gradient(circle at 8% 14%, rgba(255,211,84,.18) 0 54px, transparent 55px),
+    radial-gradient(circle at 92% 20%, rgba(126,199,230,.16) 0 46px, transparent 47px),
+    radial-gradient(circle at 18% 82%, rgba(135,205,111,.14) 0 58px, transparent 59px),
+    linear-gradient(180deg,#f5fbf3 0%, #eef8ee 52%, #f9fff8 100%);
+  overflow-x:hidden;
+}
+body::after {
+  content:''; position:fixed; left:0; right:0; bottom:0; height:42px; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(12px 18px at 9% 80%, #79c35a 0 35%, transparent 37%),
+    radial-gradient(10px 16px at 19% 88%, #8dd56d 0 35%, transparent 37%),
+    radial-gradient(14px 20px at 73% 86%, #72bd55 0 35%, transparent 37%),
+    radial-gradient(9px 14px at 86% 78%, #99d77a 0 35%, transparent 37%),
+    linear-gradient(to top,#8dd25f 0 11px, transparent 12px);
+  opacity:.55;
+}
+button,input,textarea,select { font-family:inherit; }
+.app { display:flex; flex-direction:column; height:100dvh; max-width:760px; margin:0 auto; position:relative; z-index:1; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:18px 20px 14px; flex-shrink:0; gap:10px; }
+.topbar-title {
+  font-family:'Kiwi Maru','Zen Maru Gothic','Noto Serif TC',serif;
+  display:inline-flex; align-items:center; gap:8px;
+  color:#3f6941; letter-spacing:.04em;
+  background:rgba(255,255,255,.72);
+  border:2px dashed rgba(122,181,86,.28);
+  box-shadow:0 6px 18px rgba(99,142,85,.10);
+  padding:7px 12px 8px; border-radius:999px;
+  position:relative; white-space:nowrap;
+}
+.topbar-title::after { content:'✿'; position:absolute; right:-8px; top:-10px; font-size:15px; color:#f4b83f; transform:rotate(18deg); }
+.title-sprout { font-size:24px; filter:drop-shadow(0 3px 3px rgba(84,130,69,.15)); }
+.title-main { font-size:19px; font-weight:500; color:#294b31; }
+.title-sub { font-size:14px; font-weight:700; color:#77a466; background:#f1f9e8; border-radius:999px; padding:3px 8px; }
+.topbar-right { display:flex; gap:6px; align-items:center; }
+.icon-btn { min-width:36px; height:36px; border-radius:99px; border:none; background:white; display:flex; align-items:center; justify-content:center; gap:4px; padding:0 10px; font-size:16px; cursor:pointer; color:var(--ink-soft); box-shadow:0 1px 4px rgba(0,0,0,.08); transition:transform .15s, box-shadow .15s; }
+.icon-btn:hover { transform:scale(1.04); box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.icon-btn span { font-size:12px; font-weight:700; }
+@media (max-width:560px){ .topbar-title{font-size:14px}.streak-chip{display:none}.topbar-right{gap:4px}.topbar-right .icon-btn span{display:none}.topbar-right .icon-btn{width:36px;padding:0;border-radius:50%} }
+.streak-chip { display:flex; align-items:center; gap:5px; background:var(--gold-lt); border-radius:99px; padding:5px 12px 5px 8px; font-size:12px; color:var(--gold); font-weight:500; }
+.main { flex:1; overflow-y:auto; padding:0 16px 96px; max-width:640px; width:100%; margin:0 auto; }
+.main::-webkit-scrollbar, .panel-body::-webkit-scrollbar { display:none; }
+.hero { text-align:center; padding:6px 0 16px; }
+.plant-wrap { display:inline-block; position:relative; }
+.plant-glow { position:absolute; inset:-18px; border-radius:50%; background:radial-gradient(circle, rgba(95,160,95,.18) 0%, transparent 70%); pointer-events:none; }
+.plant-emoji { font-size:68px; line-height:1; display:block; filter:drop-shadow(0 6px 12px rgba(30,80,30,.12)); user-select:none; }
+.plant-emoji.pop { animation:pop .55s cubic-bezier(.34,1.56,.64,1); }
+@keyframes pop { 0%{transform:scale(1)} 45%{transform:scale(1.18)} 100%{transform:scale(1)} }
+.hero-label { margin-top:8px; font-size:13px; color:var(--ink-soft); }
+.level-line { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.level-pill { background:white; border-radius:99px; padding:5px 12px; color:var(--leaf); font-size:12px; font-weight:700; box-shadow:0 1px 5px rgba(30,60,30,.06); }
+.exp-wrap { width:180px; height:9px; background:white; border-radius:99px; overflow:hidden; box-shadow:inset 0 1px 3px rgba(0,0,0,.06); }
+.exp-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--leaf-lt),var(--leaf)); border-radius:99px; transition:width .4s; }
+.identity { margin:0 auto 12px; background:white; border-radius:18px; padding:14px 16px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+.identity-icon { font-size:24px; }
+.identity-title { font-size:15px; font-weight:700; color:var(--ink); }
+.identity-sub { font-size:12px; color:var(--ink-soft); margin-top:2px; line-height:1.5; }
+.card { background:white; border-radius:var(--r); padding:20px 18px; box-shadow:var(--shadow); margin-bottom:12px; }
+.card.soft { background:linear-gradient(145deg,#ffffff,#f8fcf8); }
+.card.gold { background:var(--gold-lt); }
+.card.blue { background:var(--sky-lt); }
+.card.rose { background:var(--rose-lt); }
+.section-title { font-family:'Noto Serif TC',serif; font-size:17px; font-weight:500; color:var(--ink); display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+.small { font-size:12px; color:var(--ink-soft); line-height:1.6; }
+.verse-text { font-family:'Noto Serif TC',serif; font-size:18px; line-height:1.75; color:var(--ink); margin:10px 0 6px; }
+.verse-ref { font-size:12px; color:var(--leaf); font-weight:700; margin-bottom:12px; }
+.row { display:flex; gap:8px; align-items:center; }
+.stack { display:flex; flex-direction:column; gap:10px; }
+.input, .textarea, .select { width:100%; border:1.5px solid var(--moss); border-radius:13px; padding:11px 14px; background:white; color:var(--ink); font-size:14px; outline:none; transition:border-color .2s, box-shadow .2s; }
+.textarea { min-height:70px; resize:vertical; line-height:1.7; }
+.input:focus, .textarea:focus, .select:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(61,122,61,.08); }
+.btn { border:none; border-radius:99px; background:var(--leaf); color:white; padding:11px 18px; font-size:13px; font-weight:700; cursor:pointer; transition:transform .15s, background .15s; white-space:nowrap; }
+.btn:hover { background:var(--leaf-lt); transform:scale(1.03); }
+.btn:active { transform:scale(.97); }
+.btn.secondary { background:white; color:var(--ink-soft); box-shadow:0 1px 5px rgba(0,0,0,.08); }
+.btn.gold { background:var(--gold); }
+.btn.small-btn { padding:7px 10px; font-size:12px; }
+.check-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.check-card { background:white; border:1.5px solid var(--moss); border-radius:15px; padding:13px 12px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:.2s; }
+.check-card.done { background:var(--leaf); color:white; border-color:var(--leaf); box-shadow:0 2px 10px rgba(61,122,61,.2); }
+.check-emoji { font-size:18px; }
+.check-label { font-size:13px; font-weight:700; }
+.focus-card { border:1.5px solid var(--moss); background:#fff; border-radius:15px; padding:13px 14px; display:flex; gap:10px; align-items:flex-start; margin-top:10px; }
+.focus-text { flex:1; font-size:14px; color:var(--ink-mid); line-height:1.55; }
+.grat-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.grat-item { background:white; border-radius:12px; padding:10px 12px; color:var(--ink-mid); font-size:13px; display:flex; justify-content:space-between; gap:10px; }
+.stat-mini { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.mini-box { background:white; border-radius:15px; padding:14px; box-shadow:0 1px 8px rgba(30,60,30,.04); }
+.mini-n { font-family:'Noto Serif TC',serif; font-size:25px; color:var(--leaf); line-height:1; }
+.mini-l { font-size:11px; color:var(--ink-soft); margin-top:5px; }
+.seed-item, .reward-item, .prayer-item, .history-item { display:flex; align-items:center; gap:10px; background:white; border-radius:14px; padding:13px 14px; box-shadow:0 1px 8px rgba(30,60,30,.04); }
+.seed-text, .reward-text, .prayer-text { flex:1; font-size:14px; color:var(--ink-mid); line-height:1.55; }
+.seed-actions, .reward-actions, .prayer-actions { display:flex; gap:5px; align-items:center; }
+.tiny { border:none; background:var(--mist); color:var(--ink-soft); border-radius:99px; padding:6px 9px; font-size:12px; cursor:pointer; }
+.tiny.green { background:var(--moss); color:var(--leaf); font-weight:700; }
+.tiny.gold { background:var(--gold-lt); color:var(--gold); font-weight:700; }
+.tiny.red { background:#f6dddd; color:#b94d4d; }
+.empty { text-align:center; padding:42px 20px; color:var(--ink-mute); font-size:14px; line-height:1.9; }
+.panel { position:fixed; top:0; bottom:0; left:50%; width:min(560px,100vw); background:var(--mist); z-index:50; transform:translateX(110vw); transition:transform .3s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; box-shadow:-10px 0 30px rgba(30,60,30,.10); }
+.panel.open { transform:translateX(-50%); }
+.panel-header { display:flex; align-items:center; gap:12px; padding:16px 20px 12px; flex-shrink:0; border-bottom:1px solid var(--moss); background:var(--mist); }
+.panel-back { width:36px; height:36px; border-radius:50%; border:none; background:white; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; color:var(--ink-soft); box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.panel-title { font-family:'Noto Serif TC',serif; font-size:17px; font-weight:400; color:var(--ink); }
+.panel-body { flex:1; overflow-y:auto; padding:20px 16px 32px; }
+.tabs { display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+.tab { border:none; border-radius:99px; background:white; color:var(--ink-soft); padding:8px 14px; font-size:13px; cursor:pointer; white-space:nowrap; }
+.tab.active { background:var(--leaf); color:white; }
+.stats-nums { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.stat-box { background:white; border-radius:16px; padding:18px 12px; text-align:center; box-shadow:0 1px 8px rgba(30,60,30,.04); }
+.stat-n { font-family:'Noto Serif TC',serif; font-size:31px; font-weight:300; color:var(--leaf); line-height:1; word-break:break-all; }
+.stat-l { font-size:11px; color:var(--ink-soft); margin-top:6px; line-height:1.4; }
+.chart { background:white; border-radius:16px; padding:18px 16px; margin-bottom:12px; }
+.chart-title { font-size:12px; color:var(--ink-soft); margin-bottom:14px; font-weight:700; }
+.bars { display:flex; gap:6px; align-items:flex-end; height:70px; }
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar-fill { width:100%; max-width:28px; border-radius:5px 5px 0 0; background:linear-gradient(to top,var(--leaf),var(--leaf-lt)); min-height:3px; transition:height .4s; }
+.bar-day { font-size:10px; color:var(--ink-mute); }
+.weight-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.reward-locked { opacity:.6; }
+.badge { border-radius:99px; padding:4px 8px; background:var(--moss); color:var(--leaf); font-size:11px; font-weight:700; }
+
+.bottom-nav { position:fixed; left:50%; bottom:12px; transform:translateX(-50%); width:calc(100% - 24px); max-width:640px; background:rgba(255,255,255,.94); backdrop-filter:blur(12px); border:1px solid var(--moss); border-radius:22px; padding:8px; display:grid; grid-template-columns:repeat(6,1fr); gap:6px; z-index:40; box-shadow:0 8px 28px rgba(30,60,30,.12); }
+.bottom-nav button { border:none; background:transparent; color:var(--ink-soft); border-radius:16px; padding:8px 4px; font-size:11px; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; }
+.bottom-nav button b { font-size:18px; line-height:1; }
+.bottom-nav button:hover { background:var(--mist); color:var(--leaf); }
+@media (min-width:900px){ .bottom-nav{bottom:20px} }
+
+
+/* ── CUTE OUTDOOR DECOR ── */
+.cute-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.cute-bg span { position:absolute; opacity:.72; filter:drop-shadow(0 3px 2px rgba(60,110,60,.08)); user-select:none; }
+.deco-sun { left:4%; top:18%; font-size:34px; animation:floaty 5.5s ease-in-out infinite; }
+.deco-cloud { right:7%; top:16%; font-size:36px; animation:floaty 6.5s ease-in-out infinite reverse; }
+.deco-flower1 { left:8%; bottom:16%; font-size:24px; animation:wobble 4.8s ease-in-out infinite; }
+.deco-flower2 { right:10%; bottom:21%; font-size:26px; animation:wobble 5.1s ease-in-out infinite reverse; }
+.deco-bird { right:16%; top:42%; font-size:21px; transform:rotate(-12deg); animation:bird 9s ease-in-out infinite; }
+.deco-butterfly { left:16%; top:48%; font-size:20px; animation:floaty 4.6s ease-in-out infinite; }
+.deco-tree { left:3%; bottom:5%; font-size:34px; opacity:.55!important; }
+.deco-tree2 { right:4%; bottom:4%; font-size:38px; opacity:.55!important; }
+@keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes wobble { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(6deg)} }
+@keyframes bird { 0%,100%{transform:translateX(0) rotate(-12deg)} 50%{transform:translateX(-22px) translateY(-8px) rotate(4deg)} }
+.card { border:1.5px solid rgba(126,173,111,.16); position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; right:14px; top:12px; width:38px; height:18px; border-radius:999px; background:radial-gradient(circle at 9px 9px,#ffe783 0 3px,transparent 4px), radial-gradient(circle at 23px 9px,#9edc78 0 3px,transparent 4px); opacity:.35; pointer-events:none; }
+.section-title { font-family:'Kiwi Maru','Noto Serif TC',serif; color:#355c3a; }
+.hero { position:relative; }
+.hero::before, .hero::after { content:''; position:absolute; top:32px; width:76px; height:42px; opacity:.34; pointer-events:none; }
+.hero::before { left:8%; background:radial-gradient(circle at 20% 75%, #75bd54 0 7px, transparent 8px), radial-gradient(circle at 42% 50%, #f4cf4e 0 5px, transparent 6px), radial-gradient(circle at 64% 78%, #75bd54 0 6px, transparent 7px); }
+.hero::after { right:8%; background:radial-gradient(circle at 20% 75%, #6dbb55 0 7px, transparent 8px), radial-gradient(circle at 48% 45%, #76c5dc 0 5px, transparent 6px), radial-gradient(circle at 72% 72%, #f4cf4e 0 6px, transparent 7px); }
+@media (max-width:680px){
+  .deco-sun,.deco-cloud,.deco-tree,.deco-tree2{ display:none; }
+  .deco-flower1{ left:2%; bottom:12%; font-size:18px; }
+  .deco-flower2{ right:2%; bottom:16%; font-size:18px; }
+  .topbar-title { padding:6px 9px; gap:5px; }
+  .title-sprout{font-size:20px}.title-main{font-size:16px}.title-sub{font-size:12px;padding:2px 6px}
+}
+
+
+/* ── V5 FLAT HAND-DRAWN STYLE OVERRIDE ── */
+html, body, button, input, textarea, select,
+.topbar-title, .title-main, .title-sub,
+.section-title, .verse-text, .panel-title, .modal-title,
+.stat-n, .mini-n {
+  font-family:'Noto Sans TC', sans-serif !important;
+}
+body {
+  background:
+    linear-gradient(180deg, #eaf8ff 0%, #f6fcff 33%, #fffdf4 34%, #fffef9 100%);
+}
+body::before {
+  content:'';
+  position:fixed;
+  left:0; right:0; top:0;
+  height:42vh;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 18% 58%, rgba(255,255,255,.92) 0 46px, transparent 47px),
+    radial-gradient(circle at 22% 52%, rgba(255,255,255,.92) 0 35px, transparent 36px),
+    radial-gradient(circle at 12% 62%, rgba(255,255,255,.92) 0 30px, transparent 31px),
+    radial-gradient(circle at 78% 48%, rgba(255,255,255,.92) 0 42px, transparent 43px),
+    radial-gradient(circle at 84% 54%, rgba(255,255,255,.92) 0 31px, transparent 32px);
+  opacity:.72;
+}
+body::after {
+  height:86px;
+  opacity:1;
+  background:
+    radial-gradient(14px 22px at 7% 58%, #82c65b 0 35%, transparent 37%),
+    radial-gradient(10px 18px at 12% 76%, #f5c64a 0 33%, transparent 35%),
+    radial-gradient(12px 20px at 18% 68%, #e98670 0 32%, transparent 34%),
+    radial-gradient(13px 22px at 76% 64%, #85c760 0 35%, transparent 37%),
+    radial-gradient(10px 18px at 84% 75%, #f2c44d 0 33%, transparent 35%),
+    linear-gradient(to top, #a8d675 0 30px, transparent 31px);
+}
+.app { max-width:1180px; }
+.main { max-width:1060px; }
+.topbar {
+  max-width:1180px;
+  width:100%;
+  margin:0 auto;
+  padding:20px 22px 12px;
+}
+.topbar-title {
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  border-radius:0;
+  padding:2px 0;
+  gap:9px;
+}
+.topbar-title::after { display:none; }
+.title-sprout {
+  width:32px; height:32px;
+  display:inline-block;
+  position:relative;
+  filter:none;
+  border:2px solid #6f8f62;
+  border-radius:8px 8px 12px 12px;
+  background:#f4dfb5;
+  transform:rotate(-3deg);
+}
+.title-sprout::before,
+.title-sprout::after {
+  content:''; position:absolute; top:-12px;
+  width:17px; height:11px;
+  border:2px solid #6f8f62;
+  background:#b8de6b;
+  border-radius:100% 0 100% 0;
+}
+.title-sprout::before { left:2px; transform:rotate(15deg); }
+.title-sprout::after { right:2px; transform:scaleX(-1) rotate(15deg); }
+.title-main { font-size:24px; font-weight:800; color:#365b3d; letter-spacing:.08em; }
+.title-sub {
+  font-size:16px;
+  font-weight:800;
+  color:#567d45;
+  background:#fff7ca;
+  border:1.5px dashed rgba(235,186,54,.7);
+  box-shadow:none;
+}
+.icon-btn, .streak-chip, .level-pill, .bottom-nav, .panel-back, .tab, .btn, .tiny {
+  box-shadow:none !important;
+  border:1.5px solid rgba(111,143,98,.22);
+}
+.icon-btn, .streak-chip, .bottom-nav {
+  background:rgba(255,255,255,.86);
+}
+.hero {
+  min-height:220px;
+  padding:24px 0 28px;
+  display:grid;
+  grid-template-columns: 1fr;
+  place-items:center;
+}
+.plant-wrap {
+  transform:translateY(2px);
+  animation:softFloat 4.8s ease-in-out infinite;
+}
+.plant-glow {
+  background:radial-gradient(circle, rgba(183,218,127,.28) 0%, transparent 68%);
+}
+.plant-emoji {
+  font-size:74px;
+  filter:none;
+  text-shadow:none;
+}
+.hero-label { font-size:15px; color:#628767; font-weight:500; }
+.level-line { gap:14px; }
+.exp-wrap {
+  height:12px;
+  border:1.5px solid #bfd5b7;
+  background:#fff;
+  box-shadow:none;
+}
+.exp-fill { background:#99ca68; }
+.identity, .card, .mini-box, .stat-box, .chart,
+.seed-item, .reward-item, .prayer-item, .history-item {
+  background:rgba(255,255,255,.88);
+  border:1.5px solid rgba(112,145,96,.18);
+  box-shadow:0 8px 22px rgba(97,130,78,.08);
+}
+.card {
+  border-radius:22px;
+  overflow:visible;
+  animation:cardFloat 5.6s ease-in-out infinite;
+}
+.card:nth-of-type(2n) { animation-delay:-1.8s; }
+.card:nth-of-type(3n) { animation-delay:-3.2s; }
+.card::before {
+  background:radial-gradient(circle at 9px 9px,#ffe783 0 5px,transparent 6px), radial-gradient(circle at 27px 9px,#b8df8c 0 5px,transparent 6px);
+  opacity:.42;
+}
+.card::after {
+  content:'';
+  position:absolute;
+  right:18px;
+  bottom:-8px;
+  width:72px;
+  height:30px;
+  pointer-events:none;
+  background:
+    radial-gradient(8px 12px at 10% 82%, #8bc26c 0 38%, transparent 40%),
+    radial-gradient(7px 10px at 30% 72%, #f1c65e 0 38%, transparent 40%),
+    radial-gradient(8px 13px at 55% 78%, #e98d75 0 36%, transparent 38%),
+    linear-gradient(to top, rgba(124,183,87,.75) 0 4px, transparent 5px);
+  opacity:.55;
+}
+.card.soft { background:rgba(255,255,255,.9); }
+.card.gold { background:#fff8db; }
+.card.blue { background:#f1fbff; }
+.card.rose { background:#fff4f1; }
+.section-title, .panel-title, .modal-title {
+  font-weight:800;
+  color:#365b3d;
+  letter-spacing:.03em;
+}
+.verse-text {
+  font-size:18px;
+  line-height:1.8;
+  font-weight:500;
+  color:#334b35;
+  margin:12px 0 6px;
+  letter-spacing:.02em;
+}
+.verse-ref { color:#4f804a; font-weight:800; }
+.small, .identity-sub, .mini-l, .stat-l { color:#789879; }
+.input, .textarea, .select {
+  border:1.5px solid #d3e5cd;
+  border-radius:16px;
+  background:rgba(255,255,255,.82);
+  box-shadow:none;
+}
+.input:focus, .textarea:focus, .select:focus {
+  border-color:#94bf72;
+  box-shadow:0 0 0 4px rgba(151,197,111,.14);
+}
+.btn {
+  background:#6da85d;
+  color:white;
+}
+.btn:hover { background:#78b466; }
+.btn.secondary {
+  background:#fff;
+  color:#5f8354;
+}
+.check-card {
+  background:#fffefb;
+  border-color:#d9e7cf;
+  box-shadow:none;
+}
+.check-card.done {
+  background:#83bb67;
+  border-color:#83bb67;
+  box-shadow:none;
+}
+.panel {
+  background:linear-gradient(180deg,#edf9ff 0%, #fbfff5 48%, #fffef9 100%);
+  box-shadow:-8px 0 20px rgba(98,130,80,.10);
+}
+.panel-header { background:rgba(255,255,255,.62); backdrop-filter:blur(10px); }
+.bottom-nav {
+  background:rgba(255,255,255,.9);
+  border:1.5px solid rgba(111,143,98,.22);
+}
+/* redraw existing outdoor decorations as flat CSS, not emoji */
+.cute-bg span { display:none; }
+.cute-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.sun-doodle {
+  position:absolute; left:5%; top:15%; width:64px; height:64px;
+  border-radius:50%;
+  background:#ffe27a;
+  border:2px solid rgba(219,169,41,.38);
+  opacity:.5;
+  animation:softFloat 6s ease-in-out infinite;
+}
+.sun-doodle::before {
+  content:''; position:absolute; inset:-14px;
+  background:repeating-conic-gradient(from 0deg, rgba(226,178,52,.55) 0 8deg, transparent 8deg 24deg);
+  border-radius:50%; z-index:-1;
+}
+.cloud {
+  position:absolute; width:152px; height:52px;
+  border:2px solid rgba(132,177,204,.25);
+  background:rgba(255,255,255,.8);
+  border-radius:999px;
+  animation:softFloat 7s ease-in-out infinite;
+}
+.cloud i { position:absolute; bottom:16px; border-radius:50%; background:rgba(255,255,255,.86); border-top:2px solid rgba(132,177,204,.18); }
+.cloud i:nth-child(1){ left:24px; width:44px; height:44px; }
+.cloud i:nth-child(2){ left:55px; width:62px; height:62px; bottom:14px; }
+.cloud i:nth-child(3){ left:104px; width:36px; height:36px; }
+.cloud-a { left:9%; top:22%; transform:scale(.78); }
+.cloud-b { right:7%; top:18%; transform:scale(.92); animation-delay:-2s; }
+.cloud-c { left:45%; top:11%; transform:scale(.55); animation-delay:-4s; opacity:.7; }
+.bird { position:absolute; width:28px; height:14px; border-top:2px solid #6aa6b1; border-radius:50%; opacity:.55; }
+.bird::after { content:''; position:absolute; right:-18px; top:-2px; width:28px; height:14px; border-top:2px solid #6aa6b1; border-radius:50%; transform:rotate(18deg); }
+.bird-a { right:21%; top:31%; animation:bird 10s ease-in-out infinite; }
+.bird-b { left:31%; top:20%; transform:scale(.8); animation:bird 12s ease-in-out infinite reverse; }
+.flower-bed { position:absolute; bottom:44px; width:150px; height:72px; }
+.flower-bed::before { content:''; position:absolute; left:0; right:0; bottom:0; height:8px; background:#9bd36d; border-radius:999px; }
+.flower-bed i { position:absolute; bottom:8px; width:2px; height:30px; background:#78a95e; }
+.flower-bed i::before { content:''; position:absolute; left:-8px; top:-10px; width:17px; height:17px; border-radius:50%; background:#ffe16b; border:2px solid rgba(196,149,42,.25); }
+.flower-bed i:nth-child(1){ left:22px; height:36px; }
+.flower-bed i:nth-child(2){ left:68px; height:24px; }
+.flower-bed i:nth-child(2)::before{ background:#f39a7c; }
+.flower-bed i:nth-child(3){ left:116px; height:32px; }
+.flower-bed i:nth-child(3)::before{ background:#a5d978; }
+.flower-left{ left:4%; }
+.flower-right{ right:4%; transform:scaleX(-1); }
+.grass-line { position:absolute; left:0; right:0; bottom:0; height:58px; background:linear-gradient(to top,#a6d66f 0 28px, transparent 29px); opacity:.65; }
+@keyframes softFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+@keyframes cardFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@media (min-width:900px){
+  .main { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-content:start; }
+  .hero, .identity { grid-column:1 / -1; }
+  .card { margin-bottom:0; }
+  .card.soft { grid-column:span 1; }
+}
+@media (max-width:680px){
+  .app { max-width:760px; }
+  .topbar { padding:16px 14px 8px; }
+  .title-main{font-size:17px}.title-sub{font-size:12px;}
+  .title-sprout{width:26px;height:26px;}
+  .cloud-a, .cloud-b, .sun-doodle, .flower-bed { transform:scale(.62); opacity:.45; }
+  .cloud-a{left:-8%;top:16%;}.cloud-b{right:-12%;top:17%;}
+  .sun-doodle{left:-4%;top:22%;}
+  .flower-left{left:-38px}.flower-right{right:-38px}
+  .plant-emoji{font-size:60px;}
+  .hero{min-height:170px;padding:16px 0 20px;}
+}
+
+
+/* ── V6 INTERACTION UPDATES ── */
+.verse-card-section { perspective: 1000px; }
+.verse-flip-card {
+  position:relative; min-height:210px; margin-top:14px; cursor:pointer;
+  transform-style:preserve-3d; transition:transform .72s cubic-bezier(.34,1.56,.64,1);
+}
+.verse-flip-card.flipped { transform:rotateY(180deg); }
+.verse-face {
+  position:absolute; inset:0; border:2px solid #d9e7cf; border-radius:22px;
+  background:#fffefb; backface-visibility:hidden; display:flex; flex-direction:column;
+  justify-content:center; align-items:center; padding:22px; overflow:hidden;
+}
+.verse-face::after {
+  content:''; position:absolute; left:18px; right:18px; bottom:12px; height:22px; opacity:.42;
+  background:linear-gradient(to top,#abd77b 0 5px,transparent 6px),
+  radial-gradient(7px 10px at 18% 55%,#f5c95b 0 40%,transparent 42%),
+  radial-gradient(7px 10px at 78% 58%,#f0a28a 0 40%,transparent 42%);
+}
+.verse-front { color:#365b3d; }
+.verse-front-emoji { font-size:42px; margin-bottom:10px; animation:softFloat 3.8s ease-in-out infinite; }
+.verse-front-title { font-size:23px; font-weight:800; letter-spacing:.06em; }
+.verse-front-sub { margin-top:6px; font-size:13px; color:#789879; font-weight:700; }
+.verse-back { transform:rotateY(180deg); align-items:flex-start; }
+.verse-back .verse-text { font-size:22px; font-weight:800; line-height:1.65; width:100%; }
+.verse-back .verse-ref { font-size:14px; margin-top:8px; }
+.thinking-card { background:#fffdf7; }
+/* cute smiling sun */
+.sun-doodle {
+  left:4%; top:13%; width:92px; height:92px; opacity:.78;
+  background:#ffd34f; border:3px solid rgba(209,151,35,.24);
+}
+.sun-doodle::before {
+  inset:-24px;
+  background:repeating-conic-gradient(from 0deg, #ffc83d 0 10deg, transparent 10deg 22deg);
+  opacity:.88;
+}
+.sun-doodle i {
+  position:absolute; inset:0; display:block; border-radius:50%;
+  background:
+    radial-gradient(circle at 34% 42%,#3c2c24 0 5px, transparent 6px),
+    radial-gradient(circle at 66% 42%,#3c2c24 0 5px, transparent 6px),
+    radial-gradient(circle at 27% 58%,#f58f6f 0 10px, transparent 11px),
+    radial-gradient(circle at 73% 58%,#f58f6f 0 10px, transparent 11px);
+}
+.sun-doodle i::after {
+  content:''; position:absolute; left:35px; top:51px; width:24px; height:14px;
+  border-bottom:4px solid #3c2c24; border-radius:0 0 999px 999px;
+}
+@media (max-width:680px){
+  .sun-doodle{ width:78px;height:78px; left:-2%; top:17%; }
+  .verse-flip-card{ min-height:190px; }
+  .verse-back .verse-text{ font-size:20px; }
+}
+
+#toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--ink); color:white; padding:10px 22px; border-radius:99px; font-size:13px; z-index:200; transition:transform .3s cubic-bezier(.34,1.56,.64,1); pointer-events:none; white-space:nowrap; }
+#toast.show { transform:translateX(-50%) translateY(0); }
+#fx { position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden; }
+.sp { position:absolute; font-size:17px; animation:spFly 1s ease-out forwards; }
+@keyframes spFly { to { opacity:0; transform:translateY(-70px) scale(.4); } }
+.modal-mask { position:fixed; inset:0; background:rgba(30,45,30,.28); z-index:150; display:none; align-items:center; justify-content:center; padding:24px; }
+.modal-mask.show { display:flex; }
+.modal { width:100%; max-width:420px; background:white; border-radius:24px; padding:26px 22px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,.18); animation:modalPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes modalPop { from{ transform:scale(.92); opacity:0 } to{ transform:scale(1); opacity:1 } }
+.modal-emoji { font-size:54px; display:block; margin-bottom:8px; }
+.modal-title { font-family:'Noto Serif TC',serif; font-size:22px; color:var(--leaf); margin-bottom:8px; }
+.modal-text { font-size:14px; color:var(--ink-soft); line-height:1.7; margin-bottom:18px; }
+@media (max-height:720px) { .plant-emoji{font-size:56px}.hero{padding:2px 0 12px}.card{padding:17px 16px} }
+
+/* ── V8 PANEL BACKDROP + POLLEN CLICK FX ── */
+.panel-backdrop {
+  position:fixed; inset:0; z-index:45;
+  background:rgba(44,72,45,.10);
+  backdrop-filter:blur(2px);
+  opacity:0; pointer-events:none;
+  transition:opacity .22s ease;
+}
+.panel-backdrop.show { opacity:1; pointer-events:auto; }
+.pollen-dot {
+  position:fixed; width:8px; height:8px; border-radius:50%;
+  pointer-events:none; z-index:220;
+  background:#f8d66b;
+  box-shadow:0 0 0 2px rgba(255,255,255,.55);
+  animation:pollenFly .72s ease-out forwards;
+}
+.pollen-dot.green { background:#a8d675; }
+.pollen-dot.pink { background:#f4a391; }
+.pollen-dot.white { background:#fff8c9; }
+@keyframes pollenFly {
+  0% { opacity:1; transform:translate(0,0) scale(1); }
+  100% { opacity:0; transform:translate(var(--dx), var(--dy)) scale(.35); }
+}
+@media (max-width:680px){
+  .panel-backdrop { background:rgba(44,72,45,.08); }
+}
+
+
+/* ── V12 主線任務完成 ── */
+.focus-done-card {
+  margin-top:10px;
+  border:1.5px solid #d9e7cf;
+  border-radius:16px;
+  padding:12px 14px;
+  background:#fffefb;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  cursor:pointer;
+  transition:.2s;
+  font-size:14px;
+  font-weight:800;
+  color:#365b3d;
+}
+.focus-done-card.done {
+  background:#83bb67;
+  border-color:#83bb67;
+  color:white;
+}
+.focus-done-card .check-emoji { font-size:18px; }
+
+/* ── V11 今日雲雨光 ── */
+.mood-card { background:linear-gradient(145deg,#fffdf6,#f6fbff); }
+.mood-input-row { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
+.mood-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn.cloudy { background:#3b3f46; }
+.btn.sunny { background:#f1b94e; color:#4b3a1e; }
+.mood-sky {
+  position:relative; min-height:430px; border-radius:24px; overflow:hidden;
+  background:linear-gradient(180deg,#eaf8ff 0%,#fbfdff 55%,#fff8de 100%);
+  border:1.5px solid rgba(111,143,98,.18);
+}
+.mood-sky::before {
+  content:''; position:absolute; inset:0; opacity:.75;
+  background:
+    radial-gradient(circle at 14% 22%, rgba(255,255,255,.9) 0 44px, transparent 45px),
+    radial-gradient(circle at 22% 20%, rgba(255,255,255,.88) 0 34px, transparent 35px),
+    radial-gradient(circle at 78% 28%, rgba(255,255,255,.85) 0 48px, transparent 49px),
+    radial-gradient(circle at 87% 25%, rgba(255,255,255,.72) 0 36px, transparent 37px);
+  pointer-events:none;
+}
+.mood-sky::after {
+  content:''; position:absolute; left:0; right:0; bottom:0; height:54px;
+  background:linear-gradient(to top,#a8d675 0 26px, transparent 27px);
+  opacity:.65; pointer-events:none;
+}
+.mood-word {
+  position:absolute; z-index:1; max-width:72%; min-width:112px;
+  padding:10px 14px 20px; border-radius:18px;
+  font-size:14px; font-weight:800; line-height:1.35;
+  white-space:normal; word-break:break-word;
+  animation:moodDrift var(--dur,12s) ease-in-out infinite alternate;
+  transform:translate3d(0,0,0);
+}
+.mood-word-text { display:block; padding-right:6px; }
+.mood-word-date {
+  position:absolute; right:12px; bottom:6px;
+  font-size:10px; font-weight:700; line-height:1;
+  opacity:.58; letter-spacing:.02em;
+}
+.mood-word.cloud {
+  color:#2f3238;
+  background:rgba(255,255,255,.64);
+  border:1.5px solid rgba(45,48,54,.15);
+  box-shadow:0 8px 18px rgba(47,50,56,.06);
+}
+.mood-word.sun {
+  color:#8a5e00;
+  background:rgba(255,232,128,.72);
+  border:1.5px solid rgba(245,190,64,.35);
+  box-shadow:0 8px 18px rgba(244,188,66,.10);
+}
+.mood-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:10px 0 12px; }
+.mood-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.mood-list-item { display:flex; align-items:center; gap:8px; background:white; border:1.5px solid rgba(111,143,98,.14); border-radius:14px; padding:10px 12px; }
+.mood-list-text { flex:1; font-size:13px; color:#4a614a; line-height:1.5; }
+@keyframes moodDrift {
+  0% { transform:translate(0,0) rotate(-1.5deg); }
+  50% { transform:translate(var(--mx,10px), var(--my,-12px)) rotate(1deg); }
+  100% { transform:translate(calc(var(--mx,10px) * -0.7), calc(var(--my,-12px) * .5)) rotate(-.5deg); }
+}
+@media (max-width:680px){
+  .mood-sky{ min-height:360px; }
+  .mood-word{ font-size:13px; max-width:82%; }
+  .mood-actions{ grid-template-columns:1fr; }
+}
+
+</style>
+</head>
+<body>
+<div class="cute-bg" aria-hidden="true">
+  <div class="sun-doodle"><i></i></div>
+  <div class="cloud cloud-a"><i></i><i></i><i></i></div>
+  <div class="cloud cloud-b"><i></i><i></i><i></i></div>
+  <div class="cloud cloud-c"><i></i><i></i><i></i></div>
+  <div class="bird bird-a"></div>
+  <div class="bird bird-b"></div>
+  <div class="flower-bed flower-left"><i></i><i></i><i></i></div>
+  <div class="flower-bed flower-right"><i></i><i></i><i></i></div>
+  <div class="grass-line"></div>
+</div>
+<div class="app">
+<header class="topbar">
+  <div class="topbar-title"><span class="title-sprout" aria-hidden="true"></span><span class="title-main">小日子</span><span class="title-sub">生命花園</span></div>
+  <div class="topbar-right">
+    <div class="streak-chip">🔥 <span id="streakNum">0</span> 天</div>
+    <button class="icon-btn" onclick="openPanel('mood')" title="今日雲雨光">☁️<span>雲雨光</span></button>
+    <button class="icon-btn" onclick="openPanel('seeds')" title="靈感種子">💡<span>靈感</span></button>
+    <button class="icon-btn" onclick="openPanel('body')" title="身體成長">💪<span>身體</span></button>
+    <button class="icon-btn" onclick="openPanel('pray')" title="禱告花園">🙏<span>禱告</span></button>
+    <button class="icon-btn" onclick="openPanel('more')" title="總計">📊<span>總計</span></button>
+  </div>
+</header>
+
+<div class="main" id="mainArea">
+  <div class="hero">
+    <div class="plant-wrap"><div class="plant-glow"></div><span class="plant-emoji" id="plantEmoji">🌱</span></div>
+    <div class="hero-label" id="heroLabel">早上與神對焦，晚上回顧成長</div>
+    <div class="level-line"><span class="level-pill" id="levelPill">Lv.1 種子</span><div class="exp-wrap"><div class="exp-fill" id="expFill"></div></div><span class="small" id="expText">0/50</span></div>
+  </div>
+
+  <div class="identity" id="identityBox"><div class="identity-icon">🔴</div><div><div class="identity-title">今天是消費者</div><div class="identity-sub">還沒開始澆水，先從一件小事開始。</div></div></div>
+
+  <section class="card soft verse-card-section">
+    <div class="section-title">📖 今日靈糧</div>
+    <div class="small">每天一張小卡片，早上翻開今天的經文就好。</div>
+    <div class="verse-flip-card" id="verseFlip" onclick="openVerseCard()">
+      <div class="verse-face verse-front">
+        <div class="verse-front-emoji">📖</div>
+        <div class="verse-front-title">點我翻開</div>
+        <div class="verse-front-sub">今日經文</div>
+      </div>
+      <div class="verse-face verse-back">
+        <div class="verse-text" id="verseText"></div>
+        <div class="verse-ref" id="verseRef"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">🎥 今日讀經收穫</div>
+    <input class="input" id="devotionNote" maxlength="50" placeholder="三分鐘讀經學到什麼？一句話就好">
+  </section>
+
+  <section class="card gold">
+    <div class="section-title">🎯 今天最重要的一件事</div>
+    <div class="small">只能填一件。今天不要開太多支線任務。</div>
+    <div class="focus-card"><div>🎯</div><div class="focus-text"><input class="input" id="focusInput" placeholder="例如：去健身房 / 剪完 Apex 精華"></div></div>
+    <div class="focus-done-card" id="focusDoneCard" onclick="toggleFocusDone()"><span class="check-emoji">⬜</span><span>今天最重要的一件事完成了</span></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">💪 身體生命值</div>
+    <div class="stat-mini">
+      <div class="mini-box"><div class="mini-n" id="miniWeight">--</div><div class="mini-l">目前體重 kg</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniMonthDelta">--</div><div class="mini-l">本月變化</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniGymStreak">0</div><div class="mini-l">連續健身</div></div>
+      <div class="mini-box"><div class="mini-n" id="miniGymMonth">0</div><div class="mini-l">本月健身</div></div>
+    </div>
+  </section>
+
+  <section class="card mood-card">
+    <div class="section-title">☁️ 今日雲雨光</div>
+    <div class="small">雲、雨、光都可以先放在這裡，不用整理得很漂亮。</div>
+    <div class="mood-input-row">
+      <input class="input" id="moodInput" maxlength="40" placeholder="例如：我好累 / 我沒遲到 / 好想睡覺">
+      <div class="mood-actions">
+        <button class="btn cloudy" onclick="addMood('cloud')">🖤 放進雲裡</button>
+        <button class="btn sunny" onclick="addMood('sun')">🌟 放進陽光裡</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">🌙 晚間回顧</div>
+    <div class="check-grid" id="checkGrid"></div>
+  </section>
+
+  <section class="card thinking-card">
+    <div class="section-title">🧠 思考了什麼？</div>
+    <input class="input" id="thoughtInput" maxlength="50" placeholder="一句話就好，例如：我今天發現自己一直在逃避剪片。">
+  </section>
+
+  <section class="card blue">
+    <div class="section-title">💭 今天最大的收穫</div>
+    <input class="input" id="harvestInput" maxlength="50" placeholder="一句話就好，例如：我不是沒時間，是一直分心。">
+  </section>
+
+  <section class="card rose">
+    <div class="section-title">🙏 今天感謝的事</div>
+    <div class="row"><input class="input" id="gratInput" maxlength="30" placeholder="最多三件，可不填"><button class="btn small-btn" onclick="addGratitude()">加入</button></div>
+    <div class="grat-list" id="gratList"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">✅ 保存今天</div>
+    <div class="small">早上的經文、讀經、重點，晚上回顧後一起存。按一次就會結算今天 EXP。</div>
+    <div class="row" style="margin-top:12px"><button class="btn" style="flex:1" onclick="saveToday()">保存今天的花園 ✓</button></div>
+  </section>
+</div>
+</div>
+
+
+<!-- Mood -->
+<div class="panel" id="panel-mood"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">☁️ 今日雲雨光</div></div><div class="panel-body">
+  <div class="card"><div class="section-title">一直飄著的雲雨光</div><div class="small">這裡不會每天刷新。黑色是雲，黃色是光；好的壞的都可以一直留在這裡。</div></div>
+  <div class="mood-meta"><span class="small" id="moodCount">0 則雲雨光</span><button class="tiny red" onclick="clearAllMoods()">清空這裡</button></div>
+  <div class="mood-sky" id="moodSky"></div>
+  <div class="mood-list" id="moodList"></div>
+</div></div>
+
+<!-- Seeds -->
+<div class="panel" id="panel-seeds"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">💡 靈感種子</div></div><div class="panel-body">
+  <div class="row" style="margin-bottom:14px"><input class="input" id="seedInput" placeholder="一個閃過腦海的念頭…" onkeydown="if(event.key==='Enter')addSeed()"><button class="btn" onclick="addSeed()">種下</button></div>
+  <div class="stack" id="seedGrid"></div>
+</div></div>
+
+<!-- Body -->
+<div class="panel" id="panel-body"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">💪 身體成長</div></div><div class="panel-body">
+  <div class="card"><div class="section-title">⚖️ 今日體重</div><div class="weight-row"><input class="input" id="weightInput" type="number" step="0.1" placeholder="例如 82.0"><button class="btn" onclick="saveWeight()">記錄</button></div></div>
+  <div class="stats-nums"><div class="stat-box"><div class="stat-n" id="bodyLatest">--</div><div class="stat-l">目前體重</div></div><div class="stat-box"><div class="stat-n" id="bodyDelta">--</div><div class="stat-l">本月變化</div></div><div class="stat-box"><div class="stat-n" id="bodyGymStreak">0</div><div class="stat-l">連續健身</div></div><div class="stat-box"><div class="stat-n" id="bodyGymMonth">0</div><div class="stat-l">本月健身</div></div></div>
+  <div class="chart"><div class="chart-title">最近 14 筆體重</div><div class="bars" id="weightBars"></div></div>
+</div></div>
+
+<!-- Prayer -->
+<div class="panel" id="panel-pray"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">🙏 禱告花園</div></div><div class="panel-body">
+  <div class="card"><div class="section-title">新增禱告</div><div class="row"><select class="select" id="prayerType" style="max-width:108px"><option>感謝</option><option>代禱</option><option>困難</option><option>夢想</option></select><input class="input" id="prayerInput" placeholder="一句話記下來"><button class="btn" onclick="addPrayer()">新增</button></div></div>
+  <div class="tabs"><button class="tab active" id="tabActivePrayer" onclick="setPrayerTab('active')">禱告中</button><button class="tab" id="tabAnsweredPrayer" onclick="setPrayerTab('answered')">恩典花園</button></div>
+  <div class="stack" id="prayerList"></div>
+</div></div>
+
+<!-- More -->
+<div class="panel" id="panel-more"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">📊 總計 / 願望 / 記錄</div></div><div class="panel-body">
+  <div class="tabs"><button class="tab active" onclick="showMoreTab('stats',this)">統計</button><button class="tab" onclick="showMoreTab('rewards',this)">願望樹</button><button class="tab" onclick="showMoreTab('history',this)">記錄</button><button class="tab" onclick="showMoreTab('settings',this)">設定</button></div>
+  <div id="moreStats"></div><div id="moreRewards" style="display:none"></div><div id="moreHistory" style="display:none"></div><div id="moreSettings" style="display:none"></div>
+</div></div>
+
+
+<nav class="bottom-nav" aria-label="主要功能">
+  <button onclick="scrollToTop()"><b>🌱</b>今日</button>
+  <button onclick="openPanel('mood')"><b>☁️</b>雲雨光</button>
+  <button onclick="openPanel('seeds')"><b>💡</b>靈感</button>
+  <button onclick="openPanel('body')"><b>💪</b>身體</button>
+  <button onclick="openPanel('pray')"><b>🙏</b>禱告</button>
+  <button onclick="openPanel('more')"><b>📊</b>總計</button>
+</nav>
+
+<div class="modal-mask" id="levelModal"><div class="modal"><span class="modal-emoji">🎉</span><div class="modal-title" id="modalTitle">升級了！</div><div class="modal-text" id="modalText"></div><button class="btn" onclick="closeLevelModal()">收下獎勵</button></div></div>
+<div class="panel-backdrop" id="panelBackdrop" onclick="closePanel()"></div>
+<div id="toast"></div><div id="fx"></div>
+
+<script>
+const VERSES = [
+['你要專心仰賴耶和華，不可倚靠自己的聰明。','箴言 3:5'],['在你一切所行的事上都要認定他，他必指引你的路。','箴言 3:6'],['我靠著那加給我力量的，凡事都能做。','腓立比書 4:13'],['你們要將一切的憂慮卸給神，因為他顧念你們。','彼得前書 5:7'],['耶和華是我的牧者，我必不致缺乏。','詩篇 23:1'],['我雖然行過死蔭的幽谷，也不怕遭害，因為你與我同在。','詩篇 23:4'],['你當剛強壯膽，不要懼怕，也不要驚惶。','約書亞記 1:9'],['疲乏的，他賜能力；軟弱的，他加力量。','以賽亞書 40:29'],['但那等候耶和華的必重新得力。','以賽亞書 40:31'],['神賜給我們不是膽怯的心，乃是剛強、仁愛、謹守的心。','提摩太後書 1:7'],['你們要先求他的國和他的義，這些東西都要加給你們了。','馬太福音 6:33'],['不要為明天憂慮，因為明天自有明天的憂慮。','馬太福音 6:34'],['你們祈求，就給你們；尋找，就尋見；叩門，就給你們開門。','馬太福音 7:7'],['流淚撒種的，必歡呼收割。','詩篇 126:5'],['你的話是我腳前的燈，是我路上的光。','詩篇 119:105'],['我將你的話藏在心裡，免得我得罪你。','詩篇 119:11'],['耶和華必成全關乎我的事。','詩篇 138:8'],['你要把你的重擔卸給耶和華，他必撫養你。','詩篇 55:22'],['你所做的，要交託耶和華，你所謀的，就必成立。','箴言 16:3'],['人心籌算自己的道路，惟耶和華指引他的腳步。','箴言 16:9'],['殷勤人的手必掌權；懶惰的人必服苦。','箴言 12:24'],['懶惰人羨慕，卻無所得；殷勤人必得豐裕。','箴言 13:4'],['謹守口的，得保生命；大張嘴的，必致敗亡。','箴言 13:3'],['你要保守你心，勝過保守一切，因為一生的果效是由心發出。','箴言 4:23'],['我已指教你走智慧的道，引導你行正直的路。','箴言 4:11'],['你行走，腳步必不致狹窄；你奔跑，也不致跌倒。','箴言 4:12'],['智慧人聽見，增長學問；聰明人得著智謀。','箴言 1:5'],['敬畏耶和華是知識的開端。','箴言 1:7'],['喜樂的心乃是良藥；憂傷的靈使骨枯乾。','箴言 17:22'],['一句話說得合宜，就如金蘋果在銀網子裡。','箴言 25:11'],['凡勞苦擔重擔的人，可以到我這裡來，我就使你們得安息。','馬太福音 11:28'],['我的軛是容易的，我的擔子是輕省的。','馬太福音 11:30'],['在人這是不能的，在神凡事都能。','馬太福音 19:26'],['你們的光也當這樣照在人前。','馬太福音 5:16'],['清心的人有福了，因為他們必得見神。','馬太福音 5:8'],['使人和睦的人有福了，因為他們必稱為神的兒子。','馬太福音 5:9'],['我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。','哥林多後書 12:9'],['若有人在基督裡，他就是新造的人。','哥林多後書 5:17'],['我們行善，不可喪志；若不灰心，到了時候就要收成。','加拉太書 6:9'],['聖靈所結的果子，就是仁愛、喜樂、和平、忍耐。','加拉太書 5:22'],['你們要靠主常常喜樂。','腓立比書 4:4'],['應當一無掛慮，只要凡事藉著禱告、祈求和感謝。','腓立比書 4:6'],['神所賜出人意外的平安，必在基督耶穌裡保守你們的心懷意念。','腓立比書 4:7'],['忘記背後，努力面前的，向著標竿直跑。','腓立比書 3:13-14'],['你們要思念上面的事，不要思念地上的事。','歌羅西書 3:2'],['無論做什麼，都要從心裡做，像是給主做的。','歌羅西書 3:23'],['常常喜樂，不住地禱告，凡事謝恩。','帖撒羅尼迦前書 5:16-18'],['信就是所望之事的實底，是未見之事的確據。','希伯來書 11:1'],['仰望為我們信心創始成終的耶穌。','希伯來書 12:2'],['忍受試探的人是有福的。','雅各書 1:12'],['你們中間若有缺少智慧的，應當求那厚賜與眾人也不斥責人的神。','雅各書 1:5'],['各人要快快地聽，慢慢地說，慢慢地動怒。','雅各書 1:19'],['只是你們要行道，不要單單聽道。','雅各書 1:22'],['務要謙卑在神大能的手下，到了時候，他必叫你們升高。','彼得前書 5:6'],['你們要謹慎自守，警醒禱告。','彼得前書 4:7'],['愛裡沒有懼怕；愛既完全，就把懼怕除去。','約翰一書 4:18'],['我們愛，因為神先愛我們。','約翰一書 4:19'],['在世上你們有苦難；但你們可以放心，我已經勝了世界。','約翰福音 16:33'],['我留下平安給你們；我將我的平安賜給你們。','約翰福音 14:27'],['我是葡萄樹，你們是枝子。','約翰福音 15:5'],['叫人活著的乃是靈，肉體是無益的。','約翰福音 6:63'],['神愛世人，甚至將他的獨生子賜給他們。','約翰福音 3:16'],['你不要害怕，因為我與你同在。','以賽亞書 41:10'],['我必堅固你，我必幫助你。','以賽亞書 41:10'],['我必用我公義的右手扶持你。','以賽亞書 41:10'],['我耶和華你的神必攙扶你的右手。','以賽亞書 41:13'],['我行事誰能阻止呢？','以賽亞書 43:13'],['你從水中經過，我必與你同在。','以賽亞書 43:2'],['看哪，我要做一件新事。','以賽亞書 43:19'],['堅心倚賴你的，你必保守他十分平安。','以賽亞書 26:3'],['他必像一棵樹栽在溪水旁，按時候結果子。','詩篇 1:3'],['耶和華是我的亮光，是我的拯救，我還怕誰呢？','詩篇 27:1'],['你當等候耶和華；當壯膽，堅固你的心。','詩篇 27:14'],['神啊，求你為我造清潔的心。','詩篇 51:10'],['我的心哪，你為何憂悶？應當仰望神。','詩篇 42:11'],['我的幫助從造天地的耶和華而來。','詩篇 121:2'],['耶和華要保護你，免受一切的災害。','詩篇 121:7'],['凡敬畏耶和華、遵行他道的人便為有福。','詩篇 128:1'],['耶和華本為善，他的慈愛存到永遠。','詩篇 100:5'],['你們要休息，要知道我是神。','詩篇 46:10'],['耶和華靠近傷心的人。','詩篇 34:18'],['你們要嘗嘗主恩的滋味，便知道他是美善。','詩篇 34:8'],['少年獅子還缺食忍餓，但尋求耶和華的什麼好處都不缺。','詩篇 34:10'],['當將你的事交託耶和華，並倚靠他，他就必成全。','詩篇 37:5'],['你要以耶和華為樂，他就將你心裡所求的賜給你。','詩篇 37:4'],['你當默然倚靠耶和華，耐性等候他。','詩篇 37:7'],['耶和華的慈愛歸於敬畏他的人，從亙古到永遠。','詩篇 103:17'],['我的心哪，你要稱頌耶和華，不可忘記他的一切恩惠。','詩篇 103:2'],['他赦免你的一切罪孽，醫治你的一切疾病。','詩篇 103:3'],['你們要將心意改換一新而變化。','羅馬書 12:2'],['不要效法這個世界，只要心意更新而變化。','羅馬書 12:2'],['萬事都互相效力，叫愛神的人得益處。','羅馬書 8:28'],['靠著愛我們的主，在這一切的事上已經得勝有餘了。','羅馬書 8:37'],['若神幫助我們，誰能敵擋我們呢？','羅馬書 8:31'],['我們既因信稱義，就藉著我們的主耶穌基督得與神相和。','羅馬書 5:1'],['患難生忍耐，忍耐生老練，老練生盼望。','羅馬書 5:3-4'],['神的愛已經藉著所賜給我們的聖靈澆灌在我們心裡。','羅馬書 5:5'],['你們或吃或喝，無論做什麼，都要為榮耀神而行。','哥林多前書 10:31'],['凡事都可行，但不都有益處。','哥林多前書 10:23'],['愛是恆久忍耐，又有恩慈。','哥林多前書 13:4'],['如今常存的有信，有望，有愛；其中最大的是愛。','哥林多前書 13:13'],['主耶和華是我的力量。','哈巴谷書 3:19']
+];
+const CHECKS=[['create','🎨','創作',10],['gym','💪','健身',10],['bible','📖','讀經',5],['eat','🥗','好好吃',5]];
+const STAGES=[ [1,'種子','🌱'],[3,'幼苗','🌿'],[5,'嫩芽','🌱'],[10,'小樹','🌳'],[20,'茂盛樹','🌳'],[30,'開花樹','🌸'],[50,'結果樹','🍎'],[100,'森林守護者','🌲'] ];
+const DEFAULT_REWARDS=[
+ {name:'雞排',amount:80,level:3,claimed:false},{name:'豆花',amount:60,level:4,claimed:false},{name:'TEATOP 有料飲料',amount:70,level:5,claimed:false},{name:'珍奶',amount:65,level:7,claimed:false},{name:'鹽酥雞一次',amount:150,level:10,claimed:false},{name:'想吃很久的午餐',amount:200,level:12,claimed:false},{name:'遊戲造型小額基金',amount:300,level:15,claimed:false},{name:'一件衣服基金',amount:500,level:20,claimed:false},{name:'鍵盤基金 +500',amount:500,level:25,claimed:false},{name:'耳機基金 +500',amount:500,level:30,claimed:false}
+];
+function keyToday(){return new Date().toISOString().slice(0,10)}
+function monthKey(){return keyToday().slice(0,7)}
+function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+let data=gs('lifeGardenData',{days:{},seeds:[],weights:[],prayers:[],rewards:DEFAULT_REWARDS,totalExp:0,lastLevel:1,verseOverride:null,transfers:0,moods:[]});
+let today=data.days[keyToday()]||{checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
+let activePanel=null, prayerTab='active';
+function dayHash(){return parseInt(keyToday().replace(/-/g,''))}
+function getLevelInfo(exp=data.totalExp){ let level=Math.floor(exp/50)+1; let into=exp%50; let stage=STAGES[0]; STAGES.forEach(s=>{if(level>=s[0]) stage=s}); return {level,into,next:50,stageName:stage[1],emoji:stage[2]}; }
+function calcTodayExp(d=today){let exp=0; CHECKS.forEach(c=>{if(d.checks&&d.checks[c[0]]) exp+=c[3]}); if(d.verseOpened) exp+=5; if(d.focusDone) exp+=10; if(d.thought) exp+=5; if(d.harvest) exp+=5; if(d.gratitudes) exp+=Math.min(3,d.gratitudes.length)*3; if(d.devotion) exp+=5; return exp;}
+function saveData(){data.days[keyToday()]=today; ss('lifeGardenData',data)}
+function init(){if(!data.moods)data.moods=[];renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();}
+function renderAll(){renderLevel();renderIdentity();renderFocusDone();renderGratitudes();renderBodyMini();renderStreak();}
+function renderVerse(){let idx=dayHash()%VERSES.length; let v=VERSES[idx]; document.getElementById('verseText').textContent='「'+v[0]+'」'; document.getElementById('verseRef').textContent=v[1]; document.getElementById('devotionNote').value=today.devotion||''; document.getElementById('focusInput').value=today.focus||''; document.getElementById('thoughtInput').value=today.thought||''; document.getElementById('harvestInput').value=today.harvest||''; document.getElementById('verseFlip').classList.toggle('flipped',!!today.verseOpened); renderFocusDone();}
+function openVerseCard(){
+  if(today.verseOpened) return;
+
+  today.verseOpened = true;
+
+  // 翻開經文時就立刻結算 +5 EXP，不等到「保存今天」
+  // 並把今天標記為已保存，後面再按保存只會補差額，不會重複加分。
+  let before = getLevelInfo().level;
+  let oldExp = today.saved ? (today.savedExp || 0) : 0;
+  let newExp = calcTodayExp(today);
+  data.totalExp += (newExp - oldExp);
+  today.saved = true;
+  today.savedExp = newExp;
+  today.verseExpAwarded = true;
+
+  saveData();
+  renderVerse();
+  renderAll();
+  sparkle();
+  toast('今日靈糧已翻開 📖 +5 EXP');
+
+  let after = getLevelInfo().level;
+  if(after > before) showLevelModal(after, before);
+}
+function bindAutoSave(){['devotionNote','focusInput','thoughtInput','harvestInput'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{today.devotion=document.getElementById('devotionNote').value.trim();today.focus=document.getElementById('focusInput').value.trim();today.thought=document.getElementById('thoughtInput').value.trim();today.harvest=document.getElementById('harvestInput').value.trim();saveData();renderIdentity();});});}
+
+function renderFocusDone(){
+  let el=document.getElementById('focusDoneCard');
+  if(!el) return;
+  el.classList.toggle('done', !!today.focusDone);
+  el.innerHTML=`<span class="check-emoji">${today.focusDone?'✅':'⬜'}</span><span>今天最重要的一件事完成了</span>`;
+}
+function toggleFocusDone(){
+  today.focusDone=!today.focusDone;
+  saveData();
+  renderFocusDone();
+  renderIdentity();
+  if(today.focusDone) sparkle();
+}
+function renderChecks(){let grid=document.getElementById('checkGrid');grid.innerHTML=CHECKS.map(c=>`<div class="check-card ${today.checks[c[0]]?'done':''}" onclick="toggleCheck('${c[0]}')"><span class="check-emoji">${c[1]}</span><span class="check-label">今天有${c[2]}</span></div>`).join('')}
+function toggleCheck(k){today.checks[k]=!today.checks[k];saveData();renderChecks();renderIdentity();renderBodyMini(); if(today.checks[k]) sparkle();}
+function addGratitude(){let inp=document.getElementById('gratInput');let v=inp.value.trim(); if(!v)return; if(today.gratitudes.length>=3){toast('最多三件就好，夠了 🙏');return} today.gratitudes.push(v); inp.value=''; saveData(); renderGratitudes();}
+function delGratitude(i){today.gratitudes.splice(i,1);saveData();renderGratitudes()}
+function renderGratitudes(){let el=document.getElementById('gratList'); el.innerHTML=(today.gratitudes||[]).map((g,i)=>`<div class="grat-item"><span>🙏 ${esc(g)}</span><button class="tiny red" onclick="delGratitude(${i})">×</button></div>`).join('')}
+function saveToday(){today.devotion=document.getElementById('devotionNote').value.trim(); today.focus=document.getElementById('focusInput').value.trim(); today.thought=document.getElementById('thoughtInput').value.trim(); today.harvest=document.getElementById('harvestInput').value.trim(); let before=getLevelInfo().level; let oldExp=today.saved? today.savedExp||0 : 0; let newExp=calcTodayExp(today); data.totalExp += (newExp-oldExp); today.saved=true; today.savedExp=newExp; saveData(); let after=getLevelInfo().level; renderAll(); sparkle(); toast('今天的花園保存了 🌱'); if(after>before) showLevelModal(after,before);}
+function renderLevel(){let info=getLevelInfo();document.getElementById('levelPill').textContent=`Lv.${info.level} ${info.stageName}`;document.getElementById('plantEmoji').textContent=info.emoji;document.getElementById('expFill').style.width=(info.into/info.next*100)+'%';document.getElementById('expText').textContent=`${info.into}/${info.next}`;document.getElementById('heroLabel').textContent=`總 EXP ${data.totalExp} · ${info.stageName}`;}
+function renderIdentity(){let c=today.checks||{};let hasThought=!!(today.thought||today.harvest);let hasMain=!!today.focusDone;let icon='🔴',title='今天是消費者',sub='還沒開始澆水，先從一件小事開始。'; if(hasThought&&hasMain&&c.create){icon='✨';title='今天是創造者';sub='有思考、有主線完成、有創作，今天很完整。'} else if(hasThought&&hasMain){icon='🟢';title='今天是成長者';sub='有思考，也有把今天最重要的一件事往前推。'} else if(hasThought){icon='🟡';title='今天是觀察者';sub='有停下來想，已經不是無腦消費。'} document.getElementById('identityBox').innerHTML=`<div class="identity-icon">${icon}</div><div><div class="identity-title">${title}</div><div class="identity-sub">${sub}</div></div>`;}
+function calcStreak(){let s=0,d=new Date();while(true){let dk=d.toISOString().slice(0,10), day=data.days[dk]; let ok=day&&(day.saved||Object.values(day.checks||{}).some(Boolean)); if(!ok){if(dk===keyToday()){d.setDate(d.getDate()-1);continue} break} s++; d.setDate(d.getDate()-1);}return s}
+function renderStreak(){document.getElementById('streakNum').textContent=calcStreak()}
+function getWeightStats(){let weights=data.weights||[];let latest=weights[0]?.weight||null;let thisMonth=weights.filter(w=>w.date.slice(0,7)===monthKey()).slice().reverse();let delta=null;if(thisMonth.length>=2)delta=(thisMonth[thisMonth.length-1].weight-thisMonth[0].weight).toFixed(1);let gymMonth=Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks.gym).length;let gymStreak=0,d=new Date();while(true){let dk=d.toISOString().slice(0,10), day=data.days[dk];if(day&&day.checks&&day.checks.gym){gymStreak++;d.setDate(d.getDate()-1)}else{if(dk===keyToday()&&!today.checks.gym){break}else break}}return{latest,delta,gymMonth,gymStreak}}
+function renderBodyMini(){let s=getWeightStats();document.getElementById('miniWeight').textContent=s.latest?s.latest.toFixed(1):'--';document.getElementById('miniMonthDelta').textContent=s.delta===null?'--':(s.delta>0?'+'+s.delta:s.delta);document.getElementById('miniGymStreak').textContent=s.gymStreak;document.getElementById('miniGymMonth').textContent=s.gymMonth;}
+function saveWeight(){let inp=document.getElementById('weightInput'),v=parseFloat(inp.value);if(!v){toast('輸入今天體重');return}data.weights=data.weights.filter(w=>w.date!==keyToday());data.weights.unshift({date:keyToday(),weight:v});inp.value='';saveData();renderBodyPanel();renderBodyMini();toast('體重記錄好了 ⚖️')}
+function openPanel(id){
+  if(activePanel)document.getElementById('panel-'+activePanel).classList.remove('open');
+  activePanel=id;
+  document.getElementById('panel-'+id).classList.add('open');
+  const bd=document.getElementById('panelBackdrop'); if(bd) bd.classList.add('show');
+  if(id==='mood')renderMoodSky();if(id==='seeds')renderSeeds();if(id==='body')renderBodyPanel();if(id==='pray')renderPrayers();if(id==='more'){renderStatsMore();renderRewards();renderHistory();}
+}
+function closePanel(){
+  if(activePanel){document.getElementById('panel-'+activePanel).classList.remove('open');activePanel=null}
+  const bd=document.getElementById('panelBackdrop'); if(bd) bd.classList.remove('show');
+}
+function scrollToTop(){ closePanel(); document.getElementById('mainArea').scrollTo({top:0,behavior:'smooth'}); }
+
+function addMood(type){
+  let inp=document.getElementById('moodInput');
+  let v=inp.value.trim();
+  if(!v){toast('先寫一句今日雲雨光 ☁️');return}
+  if(!data.moods)data.moods=[];
+  data.moods.unshift({text:v,type:type,date:keyToday(),time:new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})});
+  inp.value='';
+  saveData();
+  pollenBurst(window.innerWidth/2, window.innerHeight*.72);
+  toast(type==='sun'?'放進陽光裡了 🌟':'放進雲裡了 ☁️');
+  if(activePanel==='mood') renderMoodSky();
+}
+function allMoods(){return (data.moods||[])}
+function moodDateLabel(m){
+  if(!m || !m.date) return '';
+  let parts=String(m.date).split('-');
+  return parts.length===3 ? (Number(parts[1])+'/'+Number(parts[2])) : String(m.date);
+}
+function renderMoodSky(){
+  let sky=document.getElementById('moodSky'), list=document.getElementById('moodList'), count=document.getElementById('moodCount');
+  let arr=allMoods();
+  if(count)count.textContent=arr.length+' 則雲雨光';
+  if(!sky||!list)return;
+  if(!arr.length){
+    sky.innerHTML='<div class="empty" style="position:relative;z-index:2;padding-top:145px">☁️<br><br>這裡還很空<br>可以先放一則雲雨光上來</div>';
+    list.innerHTML='';
+    return;
+  }
+  sky.innerHTML=arr.map((m,i)=>{
+    let x=8+((i*23)%72), y=10+((i*17)%66), dur=9+((i*2)%7), mx=(i%2?18:-14), my=-8-((i*5)%18);
+    return `<div class="mood-word ${m.type==='sun'?'sun':'cloud'}" style="left:${x}%;top:${y}%;--dur:${dur}s;--mx:${mx}px;--my:${my}px"><span class="mood-word-text">${esc(m.text)}</span><small class="mood-word-date">${moodDateLabel(m)}</small></div>`;
+  }).join('');
+  list.innerHTML=arr.map((m,i)=>`<div class="mood-list-item"><span>${m.type==='sun'?'🌟':'☁️'}</span><span class="mood-list-text">${esc(m.text)}<br><small style="color:var(--ink-mute)">${m.date||''} ${m.time||''}</small></span><button class="tiny red" onclick="delMood(${i})">×</button></div>`).join('');
+}
+function delMood(todayIndex){
+  let arr=allMoods(); let target=arr[todayIndex]; if(!target)return;
+  let real=(data.moods||[]).findIndex(m=>m===target || (m.date===target.date&&m.time===target.time&&m.text===target.text&&m.type===target.type));
+  if(real>-1)data.moods.splice(real,1);
+  saveData(); renderMoodSky();
+}
+function clearAllMoods(){
+  if(!confirm('要清空所有雲雨光嗎？'))return;
+  data.moods=[];
+  saveData(); renderMoodSky(); toast('雲雨光清空了 ☁️');
+}
+function clearTodayMoods(){ clearAllMoods(); }
+
+
+function addSeed(){let inp=document.getElementById('seedInput');let v=inp.value.trim();if(!v)return;data.seeds.unshift({text:v,date:keyToday(),done:false});inp.value='';saveData();renderSeeds();toast('靈感種下了 💡')}
+function executeSeed(i){let s=data.seeds[i];today.focus='製作／執行：'+s.text;s.done=true;data.transfers=(data.transfers||0)+1;document.getElementById('focusInput').value=today.focus;saveData();renderSeeds();toast('已放進今天最重要的一件事 🎯')}
+function delSeed(i){data.seeds.splice(i,1);saveData();renderSeeds()}
+function renderSeeds(){let el=document.getElementById('seedGrid');if(!data.seeds.length){el.innerHTML='<div class="empty">💡<br><br>還沒有靈感種子<br>想到影片、設計、歌、生活梗就先丟這裡</div>';return}el.innerHTML=data.seeds.map((s,i)=>`<div class="seed-item"><span>💡</span><span class="seed-text">${esc(s.text)}</span><div class="seed-actions"><button class="tiny green" onclick="executeSeed(${i})">🌱 執行</button><button class="tiny red" onclick="delSeed(${i})">×</button></div></div>`).join('')}
+function renderBodyPanel(){let s=getWeightStats();document.getElementById('bodyLatest').textContent=s.latest?s.latest.toFixed(1):'--';document.getElementById('bodyDelta').textContent=s.delta===null?'--':(s.delta>0?'+'+s.delta:s.delta);document.getElementById('bodyGymStreak').textContent=s.gymStreak;document.getElementById('bodyGymMonth').textContent=s.gymMonth;let bars=document.getElementById('weightBars');let arr=(data.weights||[]).slice(0,14).reverse();if(!arr.length){bars.innerHTML='<div class="empty" style="padding:10px">還沒有體重紀錄</div>';return}let vals=arr.map(w=>w.weight),min=Math.min(...vals),max=Math.max(...vals);bars.innerHTML=arr.map(w=>{let h=max===min?36:18+((w.weight-min)/(max-min))*42;return `<div class="bar-col"><div class="bar-fill" style="height:${h}px"></div><div class="bar-day">${w.weight.toFixed(1)}</div></div>`}).join('')}
+function addPrayer(){let text=document.getElementById('prayerInput').value.trim(),type=document.getElementById('prayerType').value;if(!text)return;data.prayers.unshift({type,text,date:keyToday(),answered:false,answeredDate:null});document.getElementById('prayerInput').value='';saveData();renderPrayers();toast('禱告種下了 🙏')}
+function answerPrayer(i){data.prayers[i].answered=true;data.prayers[i].answeredDate=keyToday();saveData();renderPrayers();sparkle();toast('開花了 🌸')}
+function delPrayer(i){data.prayers.splice(i,1);saveData();renderPrayers()}
+function setPrayerTab(t){prayerTab=t;document.getElementById('tabActivePrayer').classList.toggle('active',t==='active');document.getElementById('tabAnsweredPrayer').classList.toggle('active',t==='answered');renderPrayers()}
+function renderPrayers(){let el=document.getElementById('prayerList');let arr=data.prayers.map((p,i)=>({...p,i})).filter(p=>prayerTab==='answered'?p.answered:!p.answered);if(!arr.length){el.innerHTML=`<div class="empty">${prayerTab==='answered'?'🌸<br><br>恩典花園還在等待開花':'🙏<br><br>還沒有禱告事項'}</div>`;return}el.innerHTML=arr.map(p=>`<div class="prayer-item"><span>${p.answered?'🌸':'🙏'}</span><span class="prayer-text"><b>${p.type}</b>｜${esc(p.text)}<br><small style="color:var(--ink-mute)">${p.answered?'回應：'+p.answeredDate:'建立：'+p.date}</small></span><div class="prayer-actions">${!p.answered?`<button class="tiny green" onclick="answerPrayer(${p.i})">已蒙應允</button>`:''}<button class="tiny red" onclick="delPrayer(${p.i})">×</button></div></div>`).join('')}
+
+function migrateOpenedVerseExp(){
+  // 舊版已經翻開經文但沒有加到 EXP 的資料，會在開啟新版時自動補上。
+  if(today.verseOpened && !today.verseExpAwarded){
+    let alreadyLikelyCounted = today.saved && (today.savedExp || 0) >= 5;
+    if(!alreadyLikelyCounted){
+      data.totalExp += 5;
+      today.saved = true;
+      today.savedExp = (today.savedExp || 0) + 5;
+      toast('已補上今日靈糧 +5 EXP 📖');
+    }
+    today.verseExpAwarded = true;
+    saveData();
+  }
+}
+function repairTodayVerseExp(){
+  if(!today.verseOpened){ toast('今天還沒翻開經文喔 📖'); return; }
+  if(today.verseExpAwarded){ toast('今日靈糧 EXP 已經領過了 ✓'); return; }
+  data.totalExp += 5;
+  today.saved = true;
+  today.savedExp = (today.savedExp || 0) + 5;
+  today.verseExpAwarded = true;
+  saveData();
+  renderAll();
+  sparkle();
+  toast('已補上今日靈糧 +5 EXP 📖');
+}
+function exportBackup(){
+  const payload = JSON.stringify(data, null, 2);
+  const blob = new Blob([payload], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '小日子生命花園備份_' + keyToday() + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('備份已下載 💾');
+}
+function importBackup(){
+  const raw = document.getElementById('backupText')?.value.trim();
+  if(!raw){ toast('先貼上備份文字'); return; }
+  try{
+    const obj = JSON.parse(raw);
+    if(!obj || typeof obj !== 'object' || !obj.days){ throw new Error('bad'); }
+    data = obj;
+    today = data.days[keyToday()] || {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
+    saveData();
+    renderVerse(); renderChecks(); renderAll(); renderSettings();
+    toast('備份已還原 🌱');
+  }catch(e){ toast('備份格式不對 QQ'); }
+}
+function copyBackupText(){
+  const el = document.getElementById('backupText');
+  if(!el) return;
+  el.value = JSON.stringify(data, null, 2);
+  el.select();
+  document.execCommand('copy');
+  toast('備份文字已複製');
+}
+function resetTodayOnly(){
+  if(!confirm('確定只重置今天的紀錄嗎？總 EXP 會扣掉今天已保存的 EXP。')) return;
+  data.totalExp = Math.max(0, data.totalExp - (today.savedExp || 0));
+  delete data.days[keyToday()];
+  today = {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
+  saveData();
+  renderVerse(); renderChecks(); renderAll(); renderSettings();
+  toast('今天已重置，可以重新翻經文 🌱');
+}
+function renderSettings(){
+  const el = document.getElementById('moreSettings');
+  const todayExp = today.savedExp || 0;
+  el.innerHTML = `<div class="card"><div class="section-title">⚙️ 設定與備份</div><div class="small">如果瀏覽器快取讓今天經文已翻開但沒有加 EXP，可以在這裡補領或重置今天。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="repairTodayVerseExp()">補領今日靈糧 +5 EXP</button><button class="btn secondary" onclick="resetTodayOnly()">只重置今天紀錄</button></div></div><div class="card"><div class="section-title">💾 備份資料</div><div class="small">資料存在這台瀏覽器的 localStorage。換裝置或清快取前，建議先下載備份。</div><div class="stack" style="margin-top:12px"><button class="btn" onclick="exportBackup()">下載備份 JSON</button><button class="btn secondary" onclick="copyBackupText()">產生/複製備份文字</button><textarea class="textarea" id="backupText" placeholder="可貼上備份 JSON 後按還原" style="min-height:130px"></textarea><button class="btn gold" onclick="importBackup()">還原備份</button></div></div><div class="card"><div class="section-title">🌱 今日狀態</div><div class="small">今日已保存 EXP：${todayExp}｜經文：${today.verseOpened?'已翻開':'未翻開'}｜靈糧 EXP：${today.verseExpAwarded?'已領取':'未領取'}</div></div>`;
+}
+
+function showMoreTab(tab,btn){['Stats','Rewards','History','Settings'].forEach(n=>document.getElementById('more'+n).style.display='none');document.getElementById('more'+tab[0].toUpperCase()+tab.slice(1)).style.display='block';btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');if(tab==='stats')renderStatsMore();if(tab==='rewards')renderRewards();if(tab==='history')renderHistory();if(tab==='settings')renderSettings()}
+function countMonth(k){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks[k]).length}
+function countMonthFocusDone(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.focusDone).length}
+function countMonthThought(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&(day.thought||day.harvest)).length}
+function renderStatsMore(){let info=getLevelInfo(),answered=data.prayers.filter(p=>p.answered).length;document.getElementById('moreStats').innerHTML=`<div class="stats-nums"><div class="stat-box"><div class="stat-n">${calcStreak()}</div><div class="stat-l">連續成長天數</div></div><div class="stat-box"><div class="stat-n">${data.totalExp}</div><div class="stat-l">總 EXP</div></div><div class="stat-box"><div class="stat-n">${info.level}</div><div class="stat-l">目前等級</div></div><div class="stat-box"><div class="stat-n">${data.transfers||0}</div><div class="stat-l">靈感轉行動</div></div><div class="stat-box"><div class="stat-n">${countMonthThought()}</div><div class="stat-l">本月思考</div></div><div class="stat-box"><div class="stat-n">${countMonthFocusDone()}</div><div class="stat-l">本月主線完成</div></div><div class="stat-box"><div class="stat-n">${countMonth('create')}</div><div class="stat-l">本月創作</div></div><div class="stat-box"><div class="stat-n">${countMonth('bible')}</div><div class="stat-l">本月讀經</div></div><div class="stat-box"><div class="stat-n">${countMonth('gym')}</div><div class="stat-l">本月健身</div></div><div class="stat-box"><div class="stat-n">${countMonth('eat')}</div><div class="stat-l">本月好好吃</div></div><div class="stat-box"><div class="stat-n">${answered}</div><div class="stat-l">已蒙應允禱告</div></div></div>`}
+function addReward(){let n=document.getElementById('rewardName').value.trim(),a=parseInt(document.getElementById('rewardAmount').value||0),l=parseInt(document.getElementById('rewardLevel').value||1);if(!n)return;data.rewards.unshift({name:n,amount:a,level:l,claimed:false});saveData();renderRewards();toast('願望種下了 🎁')}
+function claimReward(i){data.rewards[i].claimed=true;saveData();renderRewards();toast('已領取，記得不要超支 😆')}
+function delReward(i){data.rewards.splice(i,1);saveData();renderRewards()}
+function renderRewards(){let lv=getLevelInfo().level;document.getElementById('moreRewards').innerHTML=`<div class="card"><div class="section-title">🎁 新增獎勵</div><div class="stack"><input class="input" id="rewardName" placeholder="例如：雞排 / 新衣服基金"><div class="row"><input class="input" id="rewardAmount" type="number" placeholder="金額"><input class="input" id="rewardLevel" type="number" placeholder="所需Lv"></div><button class="btn" onclick="addReward()">加入願望樹</button></div></div><div class="stack">${data.rewards.map((r,i)=>`<div class="reward-item ${lv<r.level?'reward-locked':''}"><span>${r.claimed?'✅':(lv>=r.level?'🎁':'🔒')}</span><span class="reward-text"><b>${esc(r.name)}</b> <span class="badge">Lv.${r.level}</span><br><small style="color:var(--ink-mute)">${r.amount?('$'+r.amount):'未設定金額'} ${r.claimed?'｜已領取':''}</small></span><div class="reward-actions">${lv>=r.level&&!r.claimed?`<button class="tiny gold" onclick="claimReward(${i})">領取</button>`:''}<button class="tiny red" onclick="delReward(${i})">×</button></div></div>`).join('')}</div>`}
+function renderHistory(){let days=Object.entries(data.days).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,60);document.getElementById('moreHistory').innerHTML=days.length?`<div class="stack">${days.map(([d,day])=>{let done=CHECKS.filter(c=>day.checks&&day.checks[c[0]]).map(c=>c[1]+c[2]).concat(day.focusDone?['🎯主線完成']:[]).join('、')||'未打勾';return `<div class="history-item"><span>📅</span><span class="prayer-text"><b>${d}</b><br>${done}<br><small style="color:var(--ink-mute)">${esc(day.thought||day.harvest||day.focus||'')}</small></span></div>`}).join('')}</div>`:'<div class="empty">🌱<br><br>還沒有記錄</div>'}
+function showLevelModal(after,before){let available=data.rewards.filter(r=>!r.claimed&&r.level<=after&&r.level>before);document.getElementById('modalTitle').textContent=`升級到 Lv.${after}！`;document.getElementById('modalText').innerHTML=available.length?`可以領取獎勵：<br><b>${available.map(r=>esc(r.name)).join('、')}</b>`:'花園長大了，繼續累積你的願望樹 🎁';document.getElementById('levelModal').classList.add('show')}
+function closeLevelModal(){document.getElementById('levelModal').classList.remove('show')}
+function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2000)}
+function sparkle(){let fx=document.getElementById('fx'),em=['✨','🌟','💚','🍃','⭐','🌸'];for(let i=0;i<6;i++)setTimeout(()=>{let s=document.createElement('div');s.className='sp';s.textContent=em[Math.floor(Math.random()*em.length)];s.style.left=(15+Math.random()*70)+'%';s.style.top=(20+Math.random()*55)+'%';fx.appendChild(s);setTimeout(()=>s.remove(),1200)},i*60)}
+function pollenBurst(x,y){
+  const colors=['','green','pink','white'];
+  for(let i=0;i<16;i++){
+    const dot=document.createElement('span');
+    dot.className='pollen-dot '+colors[i%colors.length];
+    const a=Math.random()*Math.PI*2, r=26+Math.random()*44;
+    dot.style.left=x+'px'; dot.style.top=y+'px';
+    dot.style.setProperty('--dx', Math.cos(a)*r+'px');
+    dot.style.setProperty('--dy', Math.sin(a)*r+'px');
+    document.body.appendChild(dot);
+    setTimeout(()=>dot.remove(),850);
+  }
+}
+document.addEventListener('click', function(e){
+  const target=e.target.closest('button,.check-card,.verse-flip-card,.tab,.tiny');
+  if(!target) return;
+  pollenBurst(e.clientX,e.clientY);
+}, true);
+init();
+</script>
+</body>
+</html>
