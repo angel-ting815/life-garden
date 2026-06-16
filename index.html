@@ -675,7 +675,7 @@ body::after {
 .sprout-item-icon{font-size:20px;}
 .sprout-item-body{flex:1; min-width:0;}
 .sprout-actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
-.sprout-form-grid{display:grid; grid-template-columns:1fr 150px 105px; gap:8px; margin-top:12px;}
+.sprout-form-grid{display:grid; grid-template-columns:1fr 170px; gap:8px; margin-top:12px;}
 .harvest-item { display:flex; align-items:center; gap:10px; background:white; border-radius:14px; padding:13px 14px; box-shadow:0 1px 8px rgba(30,60,30,.04); border:1.5px solid rgba(111,143,98,.14); }
 .harvest-text{flex:1; font-size:14px; color:var(--ink-mid); line-height:1.55;}
 @media (max-width:760px){
@@ -743,17 +743,16 @@ body::after {
 
   <section class="card sprout-card">
     <div class="section-title">🌱 今天推薦發芽</div>
-    <div class="small">系統會從快到期的種子裡，提醒你今天最該先推進哪一件。</div>
+    <div class="small">系統會從快到期的種子裡，提醒你今天最該先推進哪一件。完成後會自動給 EXP。</div>
     <div id="sproutRecommend"></div>
   </section>
 
   <section class="card sprout-card">
     <div class="section-title">🌿 等待發芽的種子</div>
-    <div class="small">有期限的事先種下來，首頁只顯示最靠近期限的 5 件。</div>
+    <div class="small">有期限的事先種下來，首頁只顯示最靠近期限的 5 件。完成後 EXP 會自動計算。</div>
     <div class="sprout-form-grid">
       <input class="input" id="quickSproutTitle" placeholder="例如：6/25 前完成志工營手冊">
       <input class="input" id="quickSproutDue" type="date">
-      <input class="input" id="quickSproutExp" type="number" min="0" value="20" placeholder="EXP">
     </div>
     <div class="row" style="margin-top:8px"><button class="btn" onclick="addSproutFromHome()">種下這件事</button><button class="btn secondary" onclick="openPanel('sprouts')">查看全部</button></div>
     <div class="sprout-list" id="homeSproutList"></div>
@@ -829,7 +828,7 @@ body::after {
 
 <!-- Sprouts -->
 <div class="panel" id="panel-sprouts"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">🌱 發芽清單</div></div><div class="panel-body">
-  <div class="card"><div class="section-title">新增等待發芽的種子</div><div class="small">把有期限、容易拖延的事情種下來，快到期時首頁會提醒你。</div><div class="stack" style="margin-top:12px"><input class="input" id="sproutTitle" placeholder="例如：這週五前剪完 Apex 精華"><div class="row"><input class="input" id="sproutDue" type="date"><input class="input" id="sproutExp" type="number" min="0" value="20" placeholder="完成 EXP"></div><button class="btn" onclick="addSproutFromPanel()">種下</button></div></div>
+  <div class="card"><div class="section-title">新增等待發芽的種子</div><div class="small">把有期限、容易拖延的事情種下來，快到期時首頁會提醒你。完成後 EXP 會依期限自動計算。</div><div class="stack" style="margin-top:12px"><input class="input" id="sproutTitle" placeholder="例如：這週五前剪完 Apex 精華"><input class="input" id="sproutDue" type="date"><button class="btn" onclick="addSproutFromPanel()">種下</button></div></div>
   <div class="tabs"><button class="tab active" onclick="setSproutTab('active',this)">等待發芽</button><button class="tab" onclick="setSproutTab('done',this)">收穫倉庫</button></div>
   <div class="stack" id="sproutPanelList"></div>
 </div></div>
@@ -982,11 +981,18 @@ function fmtDue(due){
   const [y,m,d]=due.split('-');
   return `${parseInt(m,10)}/${parseInt(d,10)}`;
 }
+function autoSproutExp(due){
+  const n=daysUntil(due);
+  if(n<=7) return 10;
+  if(n<=30) return 20;
+  return 30;
+}
+function sproutExp(s){return Number(s.exp)||autoSproutExp(s.due);}
 function activeSprouts(){return (data.sprouts||[]).filter(s=>!s.done).sort((a,b)=>normalizeDateStr(a.due).localeCompare(normalizeDateStr(b.due)));}
 function doneSprouts(){return (data.sprouts||[]).filter(s=>s.done).sort((a,b)=>(b.doneDate||'').localeCompare(a.doneDate||''));}
 function sproutHtml(s,i,source='home'){
   const cls=dueClass(s.due), label=dueLabel(s.due);
-  return `<div class="sprout-item ${cls==='overdue'?'overdue':''}"><span class="sprout-item-icon">${cls==='overdue'?'⚠️':'🌱'}</span><div class="sprout-item-body"><div class="sprout-title-line">${esc(s.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${label}</span><span class="sprout-chip">📅 ${fmtDue(s.due)}</span><span class="sprout-chip">+${s.exp||20} EXP</span></div></div><div class="sprout-actions"><button class="tiny green" onclick="setSproutAsFocus(${i})">設為主線</button><button class="tiny gold" onclick="completeSprout(${i})">完成</button><button class="tiny red" onclick="deleteSprout(${i})">×</button></div></div>`;
+  return `<div class="sprout-item ${cls==='overdue'?'overdue':''}"><span class="sprout-item-icon">${cls==='overdue'?'⚠️':'🌱'}</span><div class="sprout-item-body"><div class="sprout-title-line">${esc(s.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${label}</span><span class="sprout-chip">📅 ${fmtDue(s.due)}</span><span class="sprout-chip">完成 +${sproutExp(s)} EXP</span></div></div><div class="sprout-actions"><button class="tiny green" onclick="setSproutAsFocus(${i})">設為主線</button><button class="tiny gold" onclick="completeSprout(${i})">完成</button><button class="tiny red" onclick="deleteSprout(${i})">×</button></div></div>`;
 }
 function renderHomeSprouts(){
   if(!data.sprouts)data.sprouts=[];
@@ -999,23 +1005,24 @@ function renderHomeSprouts(){
     return;
   }
   const first=arr[0]; const idx=data.sprouts.indexOf(first); const cls=dueClass(first.due);
-  rec.innerHTML=`<div class="sprout-recommend"><div class="sprout-recommend-icon">${cls==='overdue'?'⚠️':'🌱'}</div><div class="sprout-recommend-body"><div class="sprout-title-line">${esc(first.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${dueLabel(first.due)}</span><span class="sprout-chip">📅 ${fmtDue(first.due)}</span><span class="sprout-chip">+${first.exp||20} EXP</span></div><div class="row" style="margin-top:10px"><button class="btn small-btn" onclick="setSproutAsFocus(${idx})">設為今日主線</button><button class="btn secondary small-btn" onclick="completeSprout(${idx})">完成收穫</button></div></div></div>`;
+  rec.innerHTML=`<div class="sprout-recommend"><div class="sprout-recommend-icon">${cls==='overdue'?'⚠️':'🌱'}</div><div class="sprout-recommend-body"><div class="sprout-title-line">${esc(first.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${dueLabel(first.due)}</span><span class="sprout-chip">📅 ${fmtDue(first.due)}</span><span class="sprout-chip">完成 +${sproutExp(first)} EXP</span></div><div class="row" style="margin-top:10px"><button class="btn small-btn" onclick="setSproutAsFocus(${idx})">設為今日主線</button><button class="btn secondary small-btn" onclick="completeSprout(${idx})">完成收穫</button></div></div></div>`;
   list.innerHTML=arr.slice(0,5).map(s=>sproutHtml(s,data.sprouts.indexOf(s),'home')).join('');
 }
-function addSprout(title,due,exp){
-  title=(title||'').trim(); due=due||keyToday(); exp=parseInt(exp||20,10)||20;
+function addSprout(title,due){
+  title=(title||'').trim(); due=due||'';
   if(!title){toast('先寫要做什麼 🌱');return;}
+  if(!due){toast('幫這顆種子設定一個期限');return;}
   if(!data.sprouts)data.sprouts=[];
-  data.sprouts.unshift({title,due,exp,created:keyToday(),done:false});
+  data.sprouts.unshift({title,due,created:keyToday(),done:false});
   saveData(); renderHomeSprouts(); if(activePanel==='sprouts')renderSproutPanel(); toast('已種下等待發芽的種子 🌱'); sparkle();
 }
 function addSproutFromHome(){
-  const t=document.getElementById('quickSproutTitle'), d=document.getElementById('quickSproutDue'), e=document.getElementById('quickSproutExp');
-  addSprout(t.value,d.value,e.value); t.value=''; d.value=''; e.value=20;
+  const t=document.getElementById('quickSproutTitle'), d=document.getElementById('quickSproutDue');
+  addSprout(t.value,d.value); t.value=''; d.value='';
 }
 function addSproutFromPanel(){
-  const t=document.getElementById('sproutTitle'), d=document.getElementById('sproutDue'), e=document.getElementById('sproutExp');
-  addSprout(t.value,d.value,e.value); t.value=''; d.value=''; e.value=20;
+  const t=document.getElementById('sproutTitle'), d=document.getElementById('sproutDue');
+  addSprout(t.value,d.value); t.value=''; d.value='';
 }
 function setSproutAsFocus(i){
   const s=data.sprouts[i]; if(!s)return;
@@ -1025,11 +1032,12 @@ function setSproutAsFocus(i){
 }
 function completeSprout(i){
   const s=data.sprouts[i]; if(!s||s.done)return;
-  if(!confirm(`確定完成「${s.title}」並獲得 +${s.exp||20} EXP 嗎？`))return;
+  const gained=sproutExp(s);
+  if(!confirm(`確定完成「${s.title}」並獲得 +${gained} EXP 嗎？`))return;
   const before=getLevelInfo().level;
   s.done=true; s.doneDate=keyToday();
-  data.totalExp += (s.exp||20);
-  saveData(); renderAll(); if(activePanel==='sprouts')renderSproutPanel(); sparkle(); toast(`收穫完成 +${s.exp||20} EXP 🌾`);
+  data.totalExp += gained;
+  saveData(); renderAll(); if(activePanel==='sprouts')renderSproutPanel(); sparkle(); toast(`收穫完成 +${gained} EXP 🌾`);
   const after=getLevelInfo().level; if(after>before) showLevelModal(after,before);
 }
 function deleteSprout(i){
