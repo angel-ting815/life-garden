@@ -136,7 +136,7 @@ button,input,textarea,select { font-family:inherit; }
 .reward-locked { opacity:.6; }
 .badge { border-radius:99px; padding:4px 8px; background:var(--moss); color:var(--leaf); font-size:11px; font-weight:700; }
 
-.bottom-nav { position:fixed; left:50%; bottom:12px; transform:translateX(-50%); width:calc(100% - 24px); max-width:640px; background:rgba(255,255,255,.94); backdrop-filter:blur(12px); border:1px solid var(--moss); border-radius:22px; padding:8px; display:grid; grid-template-columns:repeat(6,1fr); gap:6px; z-index:40; box-shadow:0 8px 28px rgba(30,60,30,.12); }
+.bottom-nav { position:fixed; left:50%; bottom:12px; transform:translateX(-50%); width:calc(100% - 24px); max-width:640px; background:rgba(255,255,255,.94); backdrop-filter:blur(12px); border:1px solid var(--moss); border-radius:22px; padding:8px; display:grid; grid-template-columns:repeat(7,1fr); gap:6px; z-index:40; box-shadow:0 8px 28px rgba(30,60,30,.12); }
 .bottom-nav button { border:none; background:transparent; color:var(--ink-soft); border-radius:16px; padding:8px 4px; font-size:11px; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; }
 .bottom-nav button b { font-size:18px; line-height:1; }
 .bottom-nav button:hover { background:var(--mist); color:var(--leaf); }
@@ -634,6 +634,55 @@ body::after {
   .mood-actions{ grid-template-columns:1fr; }
 }
 
+
+
+/* ── V14 發芽清單 / 電腦版優先 ── */
+@media (min-width:900px){
+  .app{max-width:1280px;}
+  .main{max-width:1180px; grid-template-columns:1.05fr 1.05fr 1fr;}
+  .topbar{max-width:1280px;}
+  .bottom-nav{max-width:760px;}
+}
+.sprout-card { background:linear-gradient(145deg,#f7fff0,#fffef8); }
+.sprout-recommend {
+  border:1.5px solid rgba(135,188,91,.28);
+  background:#fffef8;
+  border-radius:18px;
+  padding:14px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  margin-top:10px;
+}
+.sprout-recommend-icon{font-size:28px; line-height:1;}
+.sprout-recommend-body{flex:1; min-width:0;}
+.sprout-title-line{font-size:15px; font-weight:900; color:#365b3d; line-height:1.45; word-break:break-word;}
+.sprout-meta-line{font-size:12px; color:#789879; margin-top:4px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
+.sprout-chip{display:inline-flex; align-items:center; border-radius:999px; padding:4px 8px; font-size:11px; font-weight:800; background:#eef8e8; color:#5b8e4b;}
+.sprout-chip.soon{background:#fff3c7; color:#a66a00;}
+.sprout-chip.overdue{background:#fde4e4; color:#b64d4d;}
+.sprout-list{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+.sprout-item{
+  background:rgba(255,255,255,.92);
+  border:1.5px solid rgba(111,143,98,.18);
+  border-radius:16px;
+  padding:12px 13px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sprout-item.overdue{border-color:rgba(190,75,75,.28); background:#fff8f6;}
+.sprout-item-icon{font-size:20px;}
+.sprout-item-body{flex:1; min-width:0;}
+.sprout-actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+.sprout-form-grid{display:grid; grid-template-columns:1fr 150px 105px; gap:8px; margin-top:12px;}
+.harvest-item { display:flex; align-items:center; gap:10px; background:white; border-radius:14px; padding:13px 14px; box-shadow:0 1px 8px rgba(30,60,30,.04); border:1.5px solid rgba(111,143,98,.14); }
+.harvest-text{flex:1; font-size:14px; color:var(--ink-mid); line-height:1.55;}
+@media (max-width:760px){
+  .sprout-form-grid{grid-template-columns:1fr;}
+  .sprout-actions{justify-content:flex-start;}
+}
+
 </style>
 </head>
 <body>
@@ -653,6 +702,7 @@ body::after {
   <div class="topbar-title"><span class="title-sprout" aria-hidden="true"></span><span class="title-main">小日子</span><span class="title-sub">生命花園</span></div>
   <div class="topbar-right">
     <div class="streak-chip">🔥 <span id="streakNum">0</span> 天</div>
+    <button class="icon-btn" onclick="openPanel('sprouts')" title="發芽清單">🌱<span>發芽</span></button>
     <button class="icon-btn" onclick="openPanel('mood')" title="今日雲雨光">☁️<span>雲雨光</span></button>
     <button class="icon-btn" onclick="openPanel('seeds')" title="靈感種子">💡<span>靈感</span></button>
     <button class="icon-btn" onclick="openPanel('body')" title="身體成長">💪<span>身體</span></button>
@@ -689,6 +739,24 @@ body::after {
   <section class="card">
     <div class="section-title">🎥 今日讀經收穫</div>
     <input class="input" id="devotionNote" maxlength="50" placeholder="三分鐘讀經學到什麼？一句話就好">
+  </section>
+
+  <section class="card sprout-card">
+    <div class="section-title">🌱 今天推薦發芽</div>
+    <div class="small">系統會從快到期的種子裡，提醒你今天最該先推進哪一件。</div>
+    <div id="sproutRecommend"></div>
+  </section>
+
+  <section class="card sprout-card">
+    <div class="section-title">🌿 等待發芽的種子</div>
+    <div class="small">有期限的事先種下來，首頁只顯示最靠近期限的 5 件。</div>
+    <div class="sprout-form-grid">
+      <input class="input" id="quickSproutTitle" placeholder="例如：6/25 前完成志工營手冊">
+      <input class="input" id="quickSproutDue" type="date">
+      <input class="input" id="quickSproutExp" type="number" min="0" value="20" placeholder="EXP">
+    </div>
+    <div class="row" style="margin-top:8px"><button class="btn" onclick="addSproutFromHome()">種下這件事</button><button class="btn secondary" onclick="openPanel('sprouts')">查看全部</button></div>
+    <div class="sprout-list" id="homeSproutList"></div>
   </section>
 
   <section class="card gold">
@@ -758,6 +826,14 @@ body::after {
   <div class="mood-list" id="moodList"></div>
 </div></div>
 
+
+<!-- Sprouts -->
+<div class="panel" id="panel-sprouts"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">🌱 發芽清單</div></div><div class="panel-body">
+  <div class="card"><div class="section-title">新增等待發芽的種子</div><div class="small">把有期限、容易拖延的事情種下來，快到期時首頁會提醒你。</div><div class="stack" style="margin-top:12px"><input class="input" id="sproutTitle" placeholder="例如：這週五前剪完 Apex 精華"><div class="row"><input class="input" id="sproutDue" type="date"><input class="input" id="sproutExp" type="number" min="0" value="20" placeholder="完成 EXP"></div><button class="btn" onclick="addSproutFromPanel()">種下</button></div></div>
+  <div class="tabs"><button class="tab active" onclick="setSproutTab('active',this)">等待發芽</button><button class="tab" onclick="setSproutTab('done',this)">收穫倉庫</button></div>
+  <div class="stack" id="sproutPanelList"></div>
+</div></div>
+
 <!-- Seeds -->
 <div class="panel" id="panel-seeds"><div class="panel-header"><button class="panel-back" onclick="closePanel()">←</button><div class="panel-title">💡 靈感種子</div></div><div class="panel-body">
   <div class="row" style="margin-bottom:14px"><input class="input" id="seedInput" placeholder="一個閃過腦海的念頭…" onkeydown="if(event.key==='Enter')addSeed()"><button class="btn" onclick="addSeed()">種下</button></div>
@@ -787,6 +863,7 @@ body::after {
 
 <nav class="bottom-nav" aria-label="主要功能">
   <button onclick="scrollToTop()"><b>🌱</b>今日</button>
+  <button onclick="openPanel('sprouts')"><b>🌿</b>發芽</button>
   <button onclick="openPanel('mood')"><b>☁️</b>雲雨光</button>
   <button onclick="openPanel('seeds')"><b>💡</b>靈感</button>
   <button onclick="openPanel('body')"><b>💪</b>身體</button>
@@ -812,15 +889,15 @@ function monthKey(){return keyToday().slice(0,7)}
 function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
 function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-let data=gs('lifeGardenData',{days:{},seeds:[],weights:[],prayers:[],rewards:DEFAULT_REWARDS,totalExp:0,lastLevel:1,verseOverride:null,transfers:0,moods:[]});
+let data=gs('lifeGardenData',{days:{},seeds:[],weights:[],prayers:[],rewards:DEFAULT_REWARDS,totalExp:0,lastLevel:1,verseOverride:null,transfers:0,moods:[],sprouts:[]});
 let today=data.days[keyToday()]||{checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
 let activePanel=null, prayerTab='active';
 function dayHash(){return parseInt(keyToday().replace(/-/g,''))}
 function getLevelInfo(exp=data.totalExp){ let level=Math.floor(exp/50)+1; let into=exp%50; let stage=STAGES[0]; STAGES.forEach(s=>{if(level>=s[0]) stage=s}); return {level,into,next:50,stageName:stage[1],emoji:stage[2]}; }
 function calcTodayExp(d=today){let exp=0; CHECKS.forEach(c=>{if(d.checks&&d.checks[c[0]]) exp+=c[3]}); if(d.verseOpened) exp+=5; if(d.focusDone) exp+=10; if(d.thought) exp+=5; if(d.harvest) exp+=5; if(d.gratitudes) exp+=Math.min(3,d.gratitudes.length)*3; if(d.devotion) exp+=5; return exp;}
 function saveData(){data.days[keyToday()]=today; ss('lifeGardenData',data)}
-function init(){if(!data.moods)data.moods=[];renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();}
-function renderAll(){renderLevel();renderIdentity();renderFocusDone();renderGratitudes();renderBodyMini();renderStreak();}
+function init(){if(!data.moods)data.moods=[];if(!data.sprouts)data.sprouts=[];renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();}
+function renderAll(){renderLevel();renderIdentity();renderFocusDone();renderGratitudes();renderBodyMini();renderStreak();renderHomeSprouts();}
 function renderVerse(){let idx=dayHash()%VERSES.length; let v=VERSES[idx]; document.getElementById('verseText').textContent='「'+v[0]+'」'; document.getElementById('verseRef').textContent=v[1]; document.getElementById('devotionNote').value=today.devotion||''; document.getElementById('focusInput').value=today.focus||''; document.getElementById('thoughtInput').value=today.thought||''; document.getElementById('harvestInput').value=today.harvest||''; document.getElementById('verseFlip').classList.toggle('flipped',!!today.verseOpened); renderFocusDone();}
 function openVerseCard(){
   if(today.verseOpened) return;
@@ -879,13 +956,99 @@ function openPanel(id){
   activePanel=id;
   document.getElementById('panel-'+id).classList.add('open');
   const bd=document.getElementById('panelBackdrop'); if(bd) bd.classList.add('show');
-  if(id==='mood')renderMoodSky();if(id==='seeds')renderSeeds();if(id==='body')renderBodyPanel();if(id==='pray')renderPrayers();if(id==='more'){renderStatsMore();renderRewards();renderHistory();}
+  if(id==='sprouts')renderSproutPanel();if(id==='mood')renderMoodSky();if(id==='seeds')renderSeeds();if(id==='body')renderBodyPanel();if(id==='pray')renderPrayers();if(id==='more'){renderStatsMore();renderRewards();renderHistory();}
 }
 function closePanel(){
   if(activePanel){document.getElementById('panel-'+activePanel).classList.remove('open');activePanel=null}
   const bd=document.getElementById('panelBackdrop'); if(bd) bd.classList.remove('show');
 }
 function scrollToTop(){ closePanel(); document.getElementById('mainArea').scrollTo({top:0,behavior:'smooth'}); }
+
+
+let sproutTab='active';
+function normalizeDateStr(s){return s || keyToday();}
+function toDateOnly(s){const [y,m,d]=normalizeDateStr(s).split('-').map(Number); return new Date(y,(m||1)-1,d||1);}
+function daysUntil(due){const a=toDateOnly(keyToday()); const b=toDateOnly(due); return Math.round((b-a)/(24*60*60*1000));}
+function dueLabel(due){
+  const n=daysUntil(due);
+  if(n<0) return `已超過 ${Math.abs(n)} 天`;
+  if(n===0) return '今天到期';
+  if(n===1) return '明天到期';
+  return `剩 ${n} 天`;
+}
+function dueClass(due){const n=daysUntil(due); return n<0?'overdue':(n<=3?'soon':'');}
+function fmtDue(due){
+  if(!due) return '';
+  const [y,m,d]=due.split('-');
+  return `${parseInt(m,10)}/${parseInt(d,10)}`;
+}
+function activeSprouts(){return (data.sprouts||[]).filter(s=>!s.done).sort((a,b)=>normalizeDateStr(a.due).localeCompare(normalizeDateStr(b.due)));}
+function doneSprouts(){return (data.sprouts||[]).filter(s=>s.done).sort((a,b)=>(b.doneDate||'').localeCompare(a.doneDate||''));}
+function sproutHtml(s,i,source='home'){
+  const cls=dueClass(s.due), label=dueLabel(s.due);
+  return `<div class="sprout-item ${cls==='overdue'?'overdue':''}"><span class="sprout-item-icon">${cls==='overdue'?'⚠️':'🌱'}</span><div class="sprout-item-body"><div class="sprout-title-line">${esc(s.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${label}</span><span class="sprout-chip">📅 ${fmtDue(s.due)}</span><span class="sprout-chip">+${s.exp||20} EXP</span></div></div><div class="sprout-actions"><button class="tiny green" onclick="setSproutAsFocus(${i})">設為主線</button><button class="tiny gold" onclick="completeSprout(${i})">完成</button><button class="tiny red" onclick="deleteSprout(${i})">×</button></div></div>`;
+}
+function renderHomeSprouts(){
+  if(!data.sprouts)data.sprouts=[];
+  const rec=document.getElementById('sproutRecommend'), list=document.getElementById('homeSproutList');
+  if(!rec||!list) return;
+  const arr=activeSprouts();
+  if(!arr.length){
+    rec.innerHTML='<div class="empty" style="padding:22px 10px">🌱<br>目前沒有快到期的種子</div>';
+    list.innerHTML='<div class="empty" style="padding:18px 10px">把這週、這個月該做的事情先種下來。</div>';
+    return;
+  }
+  const first=arr[0]; const idx=data.sprouts.indexOf(first); const cls=dueClass(first.due);
+  rec.innerHTML=`<div class="sprout-recommend"><div class="sprout-recommend-icon">${cls==='overdue'?'⚠️':'🌱'}</div><div class="sprout-recommend-body"><div class="sprout-title-line">${esc(first.title)}</div><div class="sprout-meta-line"><span class="sprout-chip ${cls}">${dueLabel(first.due)}</span><span class="sprout-chip">📅 ${fmtDue(first.due)}</span><span class="sprout-chip">+${first.exp||20} EXP</span></div><div class="row" style="margin-top:10px"><button class="btn small-btn" onclick="setSproutAsFocus(${idx})">設為今日主線</button><button class="btn secondary small-btn" onclick="completeSprout(${idx})">完成收穫</button></div></div></div>`;
+  list.innerHTML=arr.slice(0,5).map(s=>sproutHtml(s,data.sprouts.indexOf(s),'home')).join('');
+}
+function addSprout(title,due,exp){
+  title=(title||'').trim(); due=due||keyToday(); exp=parseInt(exp||20,10)||20;
+  if(!title){toast('先寫要做什麼 🌱');return;}
+  if(!data.sprouts)data.sprouts=[];
+  data.sprouts.unshift({title,due,exp,created:keyToday(),done:false});
+  saveData(); renderHomeSprouts(); if(activePanel==='sprouts')renderSproutPanel(); toast('已種下等待發芽的種子 🌱'); sparkle();
+}
+function addSproutFromHome(){
+  const t=document.getElementById('quickSproutTitle'), d=document.getElementById('quickSproutDue'), e=document.getElementById('quickSproutExp');
+  addSprout(t.value,d.value,e.value); t.value=''; d.value=''; e.value=20;
+}
+function addSproutFromPanel(){
+  const t=document.getElementById('sproutTitle'), d=document.getElementById('sproutDue'), e=document.getElementById('sproutExp');
+  addSprout(t.value,d.value,e.value); t.value=''; d.value=''; e.value=20;
+}
+function setSproutAsFocus(i){
+  const s=data.sprouts[i]; if(!s)return;
+  today.focus=s.title;
+  const inp=document.getElementById('focusInput'); if(inp) inp.value=s.title;
+  saveData(); renderAll(); toast('已設為今天最重要的一件事 🎯'); sparkle();
+}
+function completeSprout(i){
+  const s=data.sprouts[i]; if(!s||s.done)return;
+  if(!confirm(`確定完成「${s.title}」並獲得 +${s.exp||20} EXP 嗎？`))return;
+  const before=getLevelInfo().level;
+  s.done=true; s.doneDate=keyToday();
+  data.totalExp += (s.exp||20);
+  saveData(); renderAll(); if(activePanel==='sprouts')renderSproutPanel(); sparkle(); toast(`收穫完成 +${s.exp||20} EXP 🌾`);
+  const after=getLevelInfo().level; if(after>before) showLevelModal(after,before);
+}
+function deleteSprout(i){
+  if(!data.sprouts[i])return;
+  if(!confirm('確定刪除這顆種子嗎？'))return;
+  data.sprouts.splice(i,1); saveData(); renderHomeSprouts(); if(activePanel==='sprouts')renderSproutPanel();
+}
+function setSproutTab(tab,btn){sproutTab=tab; btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); renderSproutPanel();}
+function renderSproutPanel(){
+  const el=document.getElementById('sproutPanelList'); if(!el)return;
+  if(!data.sprouts)data.sprouts=[];
+  if(sproutTab==='done'){
+    const arr=doneSprouts();
+    el.innerHTML=arr.length?arr.map(s=>`<div class="harvest-item"><span>🌾</span><span class="harvest-text"><b>${esc(s.title)}</b><br><small style="color:var(--ink-mute)">完成：${s.doneDate||''}｜獲得 +${s.exp||20} EXP</small></span></div>`).join(''):'<div class="empty">🌾<br><br>收穫倉庫還是空的</div>';
+    return;
+  }
+  const arr=activeSprouts();
+  el.innerHTML=arr.length?arr.map(s=>sproutHtml(s,data.sprouts.indexOf(s),'panel')).join(''):'<div class="empty">🌱<br><br>目前沒有等待發芽的種子</div>';
+}
 
 function addMood(type){
   let inp=document.getElementById('moodInput');
@@ -1042,7 +1205,7 @@ function showMoreTab(tab,btn){['Stats','Rewards','History','Settings'].forEach(n
 function countMonth(k){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks[k]).length}
 function countMonthFocusDone(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.focusDone).length}
 function countMonthThought(){return Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&(day.thought||day.harvest)).length}
-function renderStatsMore(){let info=getLevelInfo(),answered=data.prayers.filter(p=>p.answered).length;document.getElementById('moreStats').innerHTML=`<div class="stats-nums"><div class="stat-box"><div class="stat-n">${calcStreak()}</div><div class="stat-l">連續成長天數</div></div><div class="stat-box"><div class="stat-n">${data.totalExp}</div><div class="stat-l">總 EXP</div></div><div class="stat-box"><div class="stat-n">${info.level}</div><div class="stat-l">目前等級</div></div><div class="stat-box"><div class="stat-n">${data.transfers||0}</div><div class="stat-l">靈感轉行動</div></div><div class="stat-box"><div class="stat-n">${countMonthThought()}</div><div class="stat-l">本月思考</div></div><div class="stat-box"><div class="stat-n">${countMonthFocusDone()}</div><div class="stat-l">本月主線完成</div></div><div class="stat-box"><div class="stat-n">${countMonth('create')}</div><div class="stat-l">本月創作</div></div><div class="stat-box"><div class="stat-n">${countMonth('bible')}</div><div class="stat-l">本月讀經</div></div><div class="stat-box"><div class="stat-n">${countMonth('gym')}</div><div class="stat-l">本月健身</div></div><div class="stat-box"><div class="stat-n">${countMonth('eat')}</div><div class="stat-l">本月好好吃</div></div><div class="stat-box"><div class="stat-n">${answered}</div><div class="stat-l">已蒙應允禱告</div></div></div>`}
+function renderStatsMore(){let info=getLevelInfo(),answered=data.prayers.filter(p=>p.answered).length;document.getElementById('moreStats').innerHTML=`<div class="stats-nums"><div class="stat-box"><div class="stat-n">${calcStreak()}</div><div class="stat-l">連續成長天數</div></div><div class="stat-box"><div class="stat-n">${data.totalExp}</div><div class="stat-l">總 EXP</div></div><div class="stat-box"><div class="stat-n">${info.level}</div><div class="stat-l">目前等級</div></div><div class="stat-box"><div class="stat-n">${data.transfers||0}</div><div class="stat-l">靈感轉行動</div></div><div class="stat-box"><div class="stat-n">${activeSprouts().length}</div><div class="stat-l">等待發芽</div></div><div class="stat-box"><div class="stat-n">${doneSprouts().length}</div><div class="stat-l">收穫倉庫</div></div><div class="stat-box"><div class="stat-n">${countMonthThought()}</div><div class="stat-l">本月思考</div></div><div class="stat-box"><div class="stat-n">${countMonthFocusDone()}</div><div class="stat-l">本月主線完成</div></div><div class="stat-box"><div class="stat-n">${countMonth('create')}</div><div class="stat-l">本月創作</div></div><div class="stat-box"><div class="stat-n">${countMonth('bible')}</div><div class="stat-l">本月讀經</div></div><div class="stat-box"><div class="stat-n">${countMonth('gym')}</div><div class="stat-l">本月健身</div></div><div class="stat-box"><div class="stat-n">${countMonth('eat')}</div><div class="stat-l">本月好好吃</div></div><div class="stat-box"><div class="stat-n">${answered}</div><div class="stat-l">已蒙應允禱告</div></div></div>`}
 function addReward(){let n=document.getElementById('rewardName').value.trim(),a=parseInt(document.getElementById('rewardAmount').value||0),l=parseInt(document.getElementById('rewardLevel').value||1);if(!n)return;data.rewards.unshift({name:n,amount:a,level:l,claimed:false});saveData();renderRewards();toast('願望種下了 🎁')}
 function claimReward(i){data.rewards[i].claimed=true;saveData();renderRewards();toast('已領取，記得不要超支 😆')}
 function delReward(i){data.rewards.splice(i,1);saveData();renderRewards()}
