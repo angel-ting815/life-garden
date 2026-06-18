@@ -683,11 +683,12 @@ body::after {
   .sprout-actions{justify-content:flex-start;}
 }
 
-/* V14.2 今日讀經收穫輸入框加大 */
-.devotion-textarea{
-  min-height:150px;
-  line-height:1.8;
-  font-size:15px;
+/* ── V14.3 讀經框加大 + 本地日期修正 ── */
+.devotion-box{
+  min-height:120px;
+  line-height:1.75;
+  resize:vertical;
+  padding:14px 16px;
 }
 
 </style>
@@ -745,7 +746,7 @@ body::after {
 
   <section class="card">
     <div class="section-title">🎥 今日讀經收穫</div>
-    <textarea class="textarea devotion-textarea" id="devotionNote" maxlength="160" placeholder="三分鐘讀經學到什麼？一句話就好"></textarea>
+    <textarea class="textarea devotion-box" id="devotionNote" maxlength="160" placeholder="三分鐘讀經學到什麼？一句話就好"></textarea>
   </section>
 
   <section class="card sprout-card">
@@ -890,37 +891,28 @@ const STAGES=[ [1,'種子','🌱'],[3,'幼苗','🌿'],[5,'嫩芽','🌱'],[10,'
 const DEFAULT_REWARDS=[
  {name:'雞排',amount:80,level:3,claimed:false},{name:'豆花',amount:60,level:4,claimed:false},{name:'TEATOP 有料飲料',amount:70,level:5,claimed:false},{name:'珍奶',amount:65,level:7,claimed:false},{name:'鹽酥雞一次',amount:150,level:10,claimed:false},{name:'想吃很久的午餐',amount:200,level:12,claimed:false},{name:'遊戲造型小額基金',amount:300,level:15,claimed:false},{name:'一件衣服基金',amount:500,level:20,claimed:false},{name:'鍵盤基金 +500',amount:500,level:25,claimed:false},{name:'耳機基金 +500',amount:500,level:30,claimed:false}
 ];
-function localDateKey(date=new Date()){
-  return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+function dateKey(d=new Date()){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-function keyToday(){return localDateKey()}
-function utcDateKey(date=new Date()){return date.toISOString().slice(0,10)}
+function keyToday(){return dateKey(new Date())}
 function monthKey(){return keyToday().slice(0,7)}
+function blankDay(){return {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false}}
 function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
 function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 let data=gs('lifeGardenData',{days:{},seeds:[],weights:[],prayers:[],rewards:DEFAULT_REWARDS,totalExp:0,lastLevel:1,verseOverride:null,transfers:0,moods:[],sprouts:[]});
-function blankToday(){return {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false}}
-function isBlankDay(d){return !d || (!d.verseOpened && !d.devotion && !d.focus && !d.focusDone && !d.thought && !d.harvest && !(d.gratitudes&&d.gratitudes.length) && !(d.checks&&Object.values(d.checks).some(Boolean)))}
-function migrateUtcMorningRecord(){
-  const localKey=keyToday(), utcKey=utcDateKey();
-  if(localKey!==utcKey && data.days && data.days[utcKey] && isBlankDay(data.days[localKey])){
-    data.days[localKey]=data.days[utcKey];
-    delete data.days[utcKey];
-    ss('lifeGardenData',data);
-  }
-}
-migrateUtcMorningRecord();
-let today=data.days[keyToday()]||blankToday();
+let currentDayKey=keyToday();
+let today=data.days[currentDayKey]||blankDay();
 let activePanel=null, prayerTab='active';
 function dayHash(){return parseInt(keyToday().replace(/-/g,''))}
 function getLevelInfo(exp=data.totalExp){ let level=Math.floor(exp/50)+1; let into=exp%50; let stage=STAGES[0]; STAGES.forEach(s=>{if(level>=s[0]) stage=s}); return {level,into,next:50,stageName:stage[1],emoji:stage[2]}; }
 function calcTodayExp(d=today){let exp=0; CHECKS.forEach(c=>{if(d.checks&&d.checks[c[0]]) exp+=c[3]}); if(d.verseOpened) exp+=5; if(d.focusDone) exp+=10; if(d.thought) exp+=5; if(d.harvest) exp+=5; if(d.gratitudes) exp+=Math.min(3,d.gratitudes.length)*3; if(d.devotion) exp+=5; return exp;}
-function saveData(){data.days[keyToday()]=today; ss('lifeGardenData',data)}
-function init(){if(!data.moods)data.moods=[];if(!data.sprouts)data.sprouts=[];renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();}
+function saveData(){data.days[currentDayKey]=today; ss('lifeGardenData',data)}
+function init(){if(!data.moods)data.moods=[];if(!data.sprouts)data.sprouts=[];ensureTodayFresh(true);renderVerse(); migrateOpenedVerseExp(); bindAutoSave(); renderChecks(); renderAll();startDayWatcher();}
 function renderAll(){renderLevel();renderIdentity();renderFocusDone();renderGratitudes();renderBodyMini();renderStreak();renderHomeSprouts();}
 function renderVerse(){let idx=dayHash()%VERSES.length; let v=VERSES[idx]; document.getElementById('verseText').textContent='「'+v[0]+'」'; document.getElementById('verseRef').textContent=v[1]; document.getElementById('devotionNote').value=today.devotion||''; document.getElementById('focusInput').value=today.focus||''; document.getElementById('thoughtInput').value=today.thought||''; document.getElementById('harvestInput').value=today.harvest||''; document.getElementById('verseFlip').classList.toggle('flipped',!!today.verseOpened); renderFocusDone();}
 function openVerseCard(){
+  ensureTodayFresh(false);
   if(today.verseOpened) return;
 
   today.verseOpened = true;
@@ -944,6 +936,25 @@ function openVerseCard(){
   let after = getLevelInfo().level;
   if(after > before) showLevelModal(after, before);
 }
+
+function ensureTodayFresh(silent=false){
+  const k=keyToday();
+  if(currentDayKey!==k){
+    data.days[currentDayKey]=today;
+    currentDayKey=k;
+    today=data.days[currentDayKey]||blankDay();
+    saveData();
+    renderVerse();
+    renderChecks();
+    renderAll();
+    if(!silent) toast('新的一天開始了 🌱');
+  }
+}
+function startDayWatcher(){
+  setInterval(()=>ensureTodayFresh(false), 60000);
+  window.addEventListener('focus', ()=>ensureTodayFresh(false));
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) ensureTodayFresh(false); });
+}
 function bindAutoSave(){['devotionNote','focusInput','thoughtInput','harvestInput'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{today.devotion=document.getElementById('devotionNote').value.trim();today.focus=document.getElementById('focusInput').value.trim();today.thought=document.getElementById('thoughtInput').value.trim();today.harvest=document.getElementById('harvestInput').value.trim();saveData();renderIdentity();});});}
 
 function renderFocusDone(){
@@ -964,15 +975,16 @@ function toggleCheck(k){today.checks[k]=!today.checks[k];saveData();renderChecks
 function addGratitude(){let inp=document.getElementById('gratInput');let v=inp.value.trim(); if(!v)return; if(today.gratitudes.length>=3){toast('最多三件就好，夠了 🙏');return} today.gratitudes.push(v); inp.value=''; saveData(); renderGratitudes();}
 function delGratitude(i){today.gratitudes.splice(i,1);saveData();renderGratitudes()}
 function renderGratitudes(){let el=document.getElementById('gratList'); el.innerHTML=(today.gratitudes||[]).map((g,i)=>`<div class="grat-item"><span>🙏 ${esc(g)}</span><button class="tiny red" onclick="delGratitude(${i})">×</button></div>`).join('')}
-function saveToday(){today.devotion=document.getElementById('devotionNote').value.trim(); today.focus=document.getElementById('focusInput').value.trim(); today.thought=document.getElementById('thoughtInput').value.trim(); today.harvest=document.getElementById('harvestInput').value.trim(); let before=getLevelInfo().level; let oldExp=today.saved? today.savedExp||0 : 0; let newExp=calcTodayExp(today); data.totalExp += (newExp-oldExp); today.saved=true; today.savedExp=newExp; saveData(); let after=getLevelInfo().level; renderAll(); sparkle(); toast('今天的花園保存了 🌱'); if(after>before) showLevelModal(after,before);}
+function saveToday(){ensureTodayFresh(false);today.devotion=document.getElementById('devotionNote').value.trim(); today.focus=document.getElementById('focusInput').value.trim(); today.thought=document.getElementById('thoughtInput').value.trim(); today.harvest=document.getElementById('harvestInput').value.trim(); let before=getLevelInfo().level; let oldExp=today.saved? today.savedExp||0 : 0; let newExp=calcTodayExp(today); data.totalExp += (newExp-oldExp); today.saved=true; today.savedExp=newExp; saveData(); let after=getLevelInfo().level; renderAll(); sparkle(); toast('今天的花園保存了 🌱'); if(after>before) showLevelModal(after,before);}
 function renderLevel(){let info=getLevelInfo();document.getElementById('levelPill').textContent=`Lv.${info.level} ${info.stageName}`;document.getElementById('plantEmoji').textContent=info.emoji;document.getElementById('expFill').style.width=(info.into/info.next*100)+'%';document.getElementById('expText').textContent=`${info.into}/${info.next}`;document.getElementById('heroLabel').textContent=`總 EXP ${data.totalExp} · ${info.stageName}`;}
 function renderIdentity(){let c=today.checks||{};let hasThought=!!(today.thought||today.harvest);let hasMain=!!today.focusDone;let icon='🔴',title='今天是消費者',sub='還沒開始澆水，先從一件小事開始。'; if(hasThought&&hasMain&&c.create){icon='✨';title='今天是創造者';sub='有思考、有主線完成、有創作，今天很完整。'} else if(hasThought&&hasMain){icon='🟢';title='今天是成長者';sub='有思考，也有把今天最重要的一件事往前推。'} else if(hasThought){icon='🟡';title='今天是觀察者';sub='有停下來想，已經不是無腦消費。'} document.getElementById('identityBox').innerHTML=`<div class="identity-icon">${icon}</div><div><div class="identity-title">${title}</div><div class="identity-sub">${sub}</div></div>`;}
-function calcStreak(){let s=0,d=new Date();while(true){let dk=localDateKey(d), day=data.days[dk]; let ok=day&&(day.saved||Object.values(day.checks||{}).some(Boolean)); if(!ok){if(dk===keyToday()){d.setDate(d.getDate()-1);continue} break} s++; d.setDate(d.getDate()-1);}return s}
+function calcStreak(){let s=0,d=new Date();while(true){let dk=dateKey(d), day=data.days[dk]; let ok=day&&(day.saved||day.verseOpened||Object.values(day.checks||{}).some(Boolean)); if(!ok){if(dk===keyToday()){d.setDate(d.getDate()-1);continue} break} s++; d.setDate(d.getDate()-1);}return s}
 function renderStreak(){document.getElementById('streakNum').textContent=calcStreak()}
-function getWeightStats(){let weights=data.weights||[];let latest=weights[0]?.weight||null;let thisMonth=weights.filter(w=>w.date.slice(0,7)===monthKey()).slice().reverse();let delta=null;if(thisMonth.length>=2)delta=(thisMonth[thisMonth.length-1].weight-thisMonth[0].weight).toFixed(1);let gymMonth=Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks.gym).length;let gymStreak=0,d=new Date();while(true){let dk=localDateKey(d), day=data.days[dk];if(day&&day.checks&&day.checks.gym){gymStreak++;d.setDate(d.getDate()-1)}else{if(dk===keyToday()&&!today.checks.gym){break}else break}}return{latest,delta,gymMonth,gymStreak}}
+function getWeightStats(){let weights=data.weights||[];let latest=weights[0]?.weight||null;let thisMonth=weights.filter(w=>w.date.slice(0,7)===monthKey()).slice().reverse();let delta=null;if(thisMonth.length>=2)delta=(thisMonth[thisMonth.length-1].weight-thisMonth[0].weight).toFixed(1);let gymMonth=Object.entries(data.days).filter(([d,day])=>d.slice(0,7)===monthKey()&&day.checks&&day.checks.gym).length;let gymStreak=0,d=new Date();while(true){let dk=dateKey(d), day=data.days[dk];if(day&&day.checks&&day.checks.gym){gymStreak++;d.setDate(d.getDate()-1)}else{break}}return{latest,delta,gymMonth,gymStreak}}
 function renderBodyMini(){let s=getWeightStats();document.getElementById('miniWeight').textContent=s.latest?s.latest.toFixed(1):'--';document.getElementById('miniMonthDelta').textContent=s.delta===null?'--':(s.delta>0?'+'+s.delta:s.delta);document.getElementById('miniGymStreak').textContent=s.gymStreak;document.getElementById('miniGymMonth').textContent=s.gymMonth;}
 function saveWeight(){let inp=document.getElementById('weightInput'),v=parseFloat(inp.value);if(!v){toast('輸入今天體重');return}data.weights=data.weights.filter(w=>w.date!==keyToday());data.weights.unshift({date:keyToday(),weight:v});inp.value='';saveData();renderBodyPanel();renderBodyMini();toast('體重記錄好了 ⚖️')}
 function openPanel(id){
+  ensureTodayFresh(false);
   if(activePanel)document.getElementById('panel-'+activePanel).classList.remove('open');
   activePanel=id;
   document.getElementById('panel-'+id).classList.add('open');
@@ -1183,7 +1195,7 @@ function importBackup(){
     const obj = JSON.parse(raw);
     if(!obj || typeof obj !== 'object' || !obj.days){ throw new Error('bad'); }
     data = obj;
-    today = data.days[keyToday()] || blankToday();
+    currentDayKey=keyToday(); today = data.days[currentDayKey] || blankDay();
     saveData();
     renderVerse(); renderChecks(); renderAll(); renderSettings();
     toast('備份已還原 🌱');
@@ -1199,7 +1211,7 @@ function importBackupFile(input){
       const obj = JSON.parse(reader.result);
       if(!obj || typeof obj !== 'object' || !obj.days){ throw new Error('bad'); }
       data = obj;
-      today = data.days[keyToday()] || blankToday();
+      currentDayKey=keyToday(); today = data.days[currentDayKey] || blankDay();
       saveData();
       renderVerse(); renderChecks(); renderAll(); renderSettings();
       toast('備份檔已還原到這台裝置 🌱');
@@ -1220,7 +1232,7 @@ function resetTodayOnly(){
   if(!confirm('確定只重置今天的紀錄嗎？總 EXP 會扣掉今天已保存的 EXP。')) return;
   data.totalExp = Math.max(0, data.totalExp - (today.savedExp || 0));
   delete data.days[keyToday()];
-  today = {checks:{},verseOpened:false,devotion:'',focus:'',focusDone:false,thought:'',harvest:'',gratitudes:[],saved:false};
+  today = blankDay();
   saveData();
   renderVerse(); renderChecks(); renderAll(); renderSettings();
   toast('今天已重置，可以重新翻經文 🌱');
